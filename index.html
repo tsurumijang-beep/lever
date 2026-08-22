@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>レバレッジ資産管理システム</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC', sans-serif;
+      background-color: #F4F6FA;
+      color: #334155;
+    }
+    .clay-card {
+      background: #FFFFFF;
+      border-radius: 24px;
+      box-shadow: 8px 12px 24px rgba(148, 163, 184, 0.15), -6px -6px 16px rgba(255, 255, 255, 0.9), inset 1px 1px 2px rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(241, 245, 249, 0.8);
+    }
+    .clay-card-mint {
+      background: linear-gradient(135deg, #E6FBF7 0%, #D2F7EE 100%);
+      box-shadow: 8px 12px 24px rgba(45, 212, 191, 0.15), -4px -4px 12px #FFFFFF, inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(153, 246, 228, 0.6);
+    }
+    .clay-card-peach {
+      background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
+      box-shadow: 8px 12px 24px rgba(251, 113, 133, 0.15), -4px -4px 12px #FFFFFF, inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(254, 205, 211, 0.6);
+    }
+    .clay-card-lavender {
+      background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+      box-shadow: 8px 12px 24px rgba(168, 85, 247, 0.12), -4px -4px 12px #FFFFFF, inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(221, 214, 254, 0.6);
+    }
+    .clay-card-sky {
+      background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+      box-shadow: 8px 12px 24px rgba(56, 189, 248, 0.12), -4px -4px 12px #FFFFFF, inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(186, 230, 253, 0.6);
+    }
+    .clay-card-amber {
+      background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+      box-shadow: 8px 12px 24px rgba(245, 158, 11, 0.12), -4px -4px 12px #FFFFFF, inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(253, 230, 138, 0.6);
+    }
+    .clay-button {
+      background: linear-gradient(135deg, #38BDF8 0%, #0EA5E9 100%);
+      box-shadow: 0 6px 14px rgba(14, 165, 233, 0.28), inset 0 2px 2px rgba(255, 255, 255, 0.4);
+      border-radius: 14px;
+      transition: all 0.2s ease;
+    }
+    .clay-button:hover {
+      transform: translateY(-1.5px);
+      box-shadow: 0 8px 18px rgba(14, 165, 233, 0.35);
+    }
+    .clay-button:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 8px rgba(14, 165, 233, 0.2);
+    }
+    .clay-input {
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      box-shadow: inset 2px 2px 5px rgba(148, 163, 184, 0.12);
+      border-radius: 14px;
+      transition: all 0.2s ease;
+    }
+    .clay-input:focus {
+      outline: none;
+      border-color: #38BDF8;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+    .menu-item-large {
+      font-size: 1.25rem !important;
+      line-height: 1.75rem !important;
+      padding-top: 1rem !important;
+      padding-bottom: 1rem !important;
+      padding-left: 1.25rem !important;
+      padding-right: 1.25rem !important;
+      border-radius: 1.25rem !important;
+      font-weight: 800 !important;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #F1F5F9; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row antialiased select-none">
+
+  <!-- ================= LNB (좌측 사이드바) ================= -->
+  <aside class="w-full md:w-84 lg:w-96 bg-white/85 backdrop-blur-md border-r border-slate-200/80 flex flex-col justify-between shrink-0 p-6 z-20">
+    <div class="space-y-8">
+      <div class="flex items-center gap-3.5 px-2">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-400 via-teal-300 to-rose-300 flex items-center justify-center text-2xl shadow-md shadow-sky-200 text-white font-black">
+          ⚡
+        </div>
+        <div>
+          <h1 class="text-xl font-black text-slate-800 tracking-tight" data-i18n="appTitle">レバレッジ資産管理</h1>
+          <p class="text-xs font-bold text-sky-500 tracking-wider">PRO DASHBOARD</p>
+        </div>
+      </div>
+
+      <nav class="space-y-3">
+        <button id="nav-dashboard" onclick="navigate('dashboard')" class="w-full flex items-center gap-4 menu-item-large bg-sky-50 text-sky-600 shadow-sm transition">
+          <span class="text-2xl">📊</span> <span data-i18n="navDashboard">ダッシュボード</span>
+        </button>
+        <button id="nav-settings" onclick="navigate('settings')" class="w-full flex items-center gap-4 menu-item-large text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition">
+          <span class="text-2xl">⚙️</span> <span data-i18n="navSettings">資産設定</span>
+        </button>
+        <button id="nav-monthly" onclick="navigate('monthly')" class="w-full flex items-center gap-4 menu-item-large text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition">
+          <span class="text-2xl">📅</span> <span data-i18n="navMonthly">月別集計</span>
+        </button>
+        <button id="nav-daily" onclick="navigate('daily')" class="w-full flex items-center gap-4 menu-item-large text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition">
+          <span class="text-2xl">📆</span> <span data-i18n="navDaily">日別詳細</span>
+        </button>
+        <button id="nav-backup" onclick="navigate('backup')" class="w-full flex items-center gap-4 menu-item-large text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition">
+          <span class="text-2xl">💾</span> <span data-i18n="navBackup">バックアップ</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="space-y-3 pt-6 border-t border-slate-100">
+      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1">
+        <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+          <span data-i18n="storageStatusTitle">データ保存先</span>
+          <span class="text-teal-500 flex items-center gap-1 font-extrabold" data-i18n="storageStatusSafe">● ローカル保管</span>
+        </div>
+        <p class="text-[11px] text-slate-400" data-i18n="storageStatusDesc">すべての取引データが端末に安全に保存されています。</p>
+      </div>
+      <button onclick="clearAllData()" class="w-full text-center text-xs font-bold text-rose-400 hover:text-rose-500 hover:bg-rose-50 py-2.5 rounded-xl transition" data-i18n="btnResetAll">
+        すべてのデータを初期化
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= 메인 콘텐츠 영역 ================= -->
+  <main class="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto w-full max-w-[2200px]">
+    
+    <!-- Top Bar -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-200/80 gap-4">
+      <div class="flex items-center gap-4">
+        <h2 id="viewTitle" class="text-xl md:text-2xl font-extrabold text-slate-800 flex items-center gap-2">
+          <span>📊</span> <span data-i18n="viewTitleDashboard">総合ダッシュボード</span>
+        </h2>
+        <select id="dashboardAssetFilter" onchange="render()" class="clay-input px-3 py-1.5 text-sm font-bold text-slate-700 hidden sm:block">
+          <option value="ALL" data-i18n="filterAllAssets">全資産総合</option>
+        </select>
+      </div>
+
+      <!-- 다국어 툴바: 일본어, 영어, 한국어, 중국어, 스페인어 -->
+      <div class="flex flex-wrap items-center gap-2.5 relative">
+        <div class="flex bg-white rounded-2xl border border-slate-200 p-0.5 shadow-sm">
+          <button id="lang-ja" onclick="setLanguage('ja')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">JP</button>
+          <button id="lang-en" onclick="setLanguage('en')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">EN</button>
+          <button id="lang-ko" onclick="setLanguage('ko')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">KO</button>
+          <button id="lang-zh" onclick="setLanguage('zh')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">ZH</button>
+          <button id="lang-es" onclick="setLanguage('es')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">ES</button>
+        </div>
+
+        <label class="cursor-pointer clay-button text-white font-bold text-xs px-3.5 py-2 flex items-center gap-1.5 shadow-md">
+          <span>📂</span> <span data-i18n="btnCsvUpload">CSV 添付</span>
+          <input type="file" id="csvFileInput" accept=".csv, .txt" class="hidden" onchange="handleFileUpload(event)">
+        </label>
+        
+        <button onclick="togglePastePopup()" class="bg-white hover:bg-slate-50 text-slate-600 font-bold border border-slate-200 text-xs px-3.5 py-2 rounded-2xl shadow-sm transition flex items-center gap-1.5">
+          <span>📝</span> <span data-i18n="btnPasteText">テキスト貼付</span>
+        </button>
+
+        <div id="pastePopup" class="hidden absolute right-0 top-12 w-80 bg-white rounded-3xl p-4 shadow-2xl border border-slate-100 z-50">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-extrabold text-slate-700" data-i18n="popupPasteTitle">取引履歴データの入力</span>
+            <button onclick="togglePastePopup()" class="text-xs text-slate-400 hover:text-slate-600">✕</button>
+          </div>
+          <textarea id="rawInput" rows="4" placeholder="CION.csv / Text..." class="w-full clay-input p-2.5 text-[11px] font-mono text-slate-600 mb-2"></textarea>
+          <button onclick="processData()" class="w-full clay-button text-white font-bold text-xs py-2" data-i18n="popupBtnAnalyze">
+            分析および反映
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- [공통 지표] 7가지 동일 규격 3D 파스텔 KPI 핵심 지표 그리드 -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
+      <div class="clay-card-mint p-4 rounded-3xl flex flex-col justify-between relative overflow-hidden">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-bold text-teal-800" data-i18n="kpiNetWorthTitle">実質総資産</span>
+          <span class="text-base">💎</span>
+        </div>
+        <div class="my-2">
+          <div id="kpiTotalNetWorth" class="text-xl lg:text-2xl font-black font-mono text-teal-900 tracking-tight">¥0</div>
+        </div>
+        <div id="kpiNetWorthSub" class="text-[10px] font-semibold text-teal-700/80 truncate" data-i18n="kpiNetWorthSub">残高+含み損益合算</div>
+      </div>
+
+      <div class="clay-card p-4 rounded-3xl flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-bold text-slate-500" data-i18n="kpiPrincipalTitle">初期投資元本</span>
+          <span class="text-base">💼</span>
+        </div>
+        <div class="my-2">
+          <div id="kpiPrincipal" class="text-xl lg:text-2xl font-black font-mono text-slate-800 tracking-tight">¥0</div>
+        </div>
+        <div class="text-[10px] font-semibold text-slate-400 truncate" data-i18n="kpiPrincipalSub">総資産 - 総損益 (自動算出)</div>
+      </div>
+
+      <div class="clay-card-peach p-4 rounded-3xl flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-bold text-rose-800" data-i18n="kpiTotalProfitTitle">累積総損益</span>
+          <span class="text-base">📊</span>
+        </div>
+        <div class="my-2">
+          <div id="kpiTotalProfit" class="text-xl lg:text-2xl font-black font-mono text-rose-600 tracking-tight">¥0</div>
+        </div>
+        <div id="kpiTotalProfitSub" class="text-[10px] font-semibold text-rose-700/80 truncate" data-i18n="kpiTotalProfitSub">確定損益 + 含み損益</div>
+      </div>
+
+      <div class="clay-card-amber p-4 rounded-3xl flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-bold text-amber-800" data-i18n="kpiTotalFeeTitle">累積管理手数料</span>
+          <span class="text-base">⏳</span>
+        </div>
+        <div class="my-2">
+          <div id="kpiTotalFee" class="text-xl lg:text-2xl font-black font-mono text-amber-600 tracking-tight">¥0</div>
+        </div>
+        <div class="text-[10px] font-semibold text-amber-700/80 truncate" data-i18n="kpiTotalFeeSub">06:00 ロールオーバー費</div>
+      </div>
+
+      <div class="clay-card-lavender p-4 rounded-3xl flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-bold text-purple-800" data-i18n="kpiUnrealizedTitle">未実現損益 (含み益)</span>
+          <span class="text-base">📈</span>
+        </div>
+        <div class="my-2">
+          <div id="kpiUnrealizedPnl" class="text-xl lg:text-2xl font-black font-mono text-purple-700 tracking-tight">¥0</div>
+        </div>
+        <div id="kpiUnrealizedSub" class="text-[10px] font-semibold text-purple-600/80 truncate" data-i18n="kpiUnrealizedSub">保有ポジション評価額</div>
+      </div>
+
+      <div class="clay-card-sky p-4 rounded-3xl flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-bold text-sky-800" data-i18n="kpiBalanceTitle">確定日本円残高</span>
+          <span class="text-base">🏦</span>
+        </div>
+        <div class="my-2">
+          <div id="kpiLatestBalance" class="text-xl lg:text-2xl font-black font-mono text-sky-900 tracking-tight">¥0</div>
+        </div>
+        <div id="kpiDateRange" class="text-[10px] font-semibold text-sky-700/80 truncate" data-i18n="kpiBalanceSub">最新精算データ基準</div>
+      </div>
+
+      <div class="clay-card p-4 rounded-3xl flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-bold text-slate-500" data-i18n="kpiRoiTitle">元本対比収益率</span>
+          <span class="text-base">🎯</span>
+        </div>
+        <div class="my-2">
+          <div id="kpiRoi" class="text-xl lg:text-2xl font-black font-mono text-slate-800 tracking-tight">-%</div>
+        </div>
+        <div id="kpiRoiSub" class="text-[10px] font-semibold text-slate-400 truncate" data-i18n="kpiRoiSub">総損益 ÷ 初期元本</div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 1: 대시보드 뷰 ================= -->
+    <section id="view-dashboard" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 clay-card p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-sm font-bold text-slate-800" data-i18n="chartMainTitle">📈 日別累積確定損益および残高推移</h3>
+            <span class="text-xs font-semibold text-sky-500 bg-sky-50 px-2.5 py-1 rounded-full" data-i18n="badgeAutoSync">リアルタイム連動</span>
+          </div>
+          <div class="h-80 w-full">
+            <canvas id="mainChart"></canvas>
+          </div>
+        </div>
+        <div class="clay-card p-6 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-sm font-bold text-slate-800" data-i18n="chartDonutTitle">🪙 銘柄別実現損益シェア</h3>
+            </div>
+            <div class="h-52 flex items-center justify-center">
+              <canvas id="symbolChart"></canvas>
+            </div>
+          </div>
+          <div id="symbolBreakdown" class="mt-4 space-y-2 text-xs font-medium border-t border-slate-100 pt-3 max-h-32 overflow-y-auto pr-2"></div>
+        </div>
+      </div>
+
+      <!-- 최근 5건 거래 내역 -->
+      <div class="clay-card p-6 shadow space-y-4">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">📋</span>
+            <h3 class="text-sm font-bold text-slate-800" data-i18n="recentTransactionsTitle">直近の取引履歴 (最新 5件)</h3>
+          </div>
+          <button onclick="navigate('daily')" class="text-xs font-bold text-sky-500 hover:text-sky-600 bg-sky-50 hover:bg-sky-100 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+            <span data-i18n="btnViewAllDaily">すべて見る</span> <span>&rarr;</span>
+          </button>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-100 font-bold">
+              <tr>
+                <th class="p-3" data-i18n="thDate">日付</th>
+                <th class="p-3" data-i18n="thSymbol">取引資産</th>
+                <th class="p-3 text-right" data-i18n="thTradePnl">決済損益 (円)</th>
+                <th class="p-3 text-right" data-i18n="thFee">当日手数料 (円)</th>
+                <th class="p-3 text-right" data-i18n="thNetPnl">日別純損益 (円)</th>
+                <th class="p-3 text-right" data-i18n="thDailyBal">当日残高 (円)</th>
+              </tr>
+            </thead>
+            <tbody id="recentDailyTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 2: 자산 설정 뷰 ================= -->
+    <section id="view-settings" class="hidden space-y-6 max-w-4xl">
+      <div class="clay-card p-8 space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h3 class="text-base font-extrabold text-slate-800 flex items-center gap-2">
+            <span>⚙️</span> <span data-i18n="settingsTitle">投資元本および現在ポジション設定</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-1" data-i18n="settingsDesc">
+            初期投資元本は「実質総資産 - 累積総損益」から自動逆算されます。保有ポジションの含み損益を更新してください。
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700" data-i18n="labelPrincipal">💰 初期投資元本 (円 - 自動計算連動)</label>
+            <input type="number" id="principalAmount" placeholder="Auto..." oninput="updatePrincipalAndPosition(true)" class="w-full clay-input px-4 py-3 text-sm font-mono font-bold text-slate-800">
+            <p class="text-[11px] text-teal-600 font-semibold" data-i18n="hintPrincipalAuto">※ 空欄時は「実質総資産 - 累積総損益」が自動適用されます</p>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700" data-i18n="labelAssetType">💼 保有資産の種類</label>
+            <div class="flex gap-2">
+              <select id="posSymbol" onchange="handlePosSymbolChange()" class="w-full clay-input px-3 py-3 text-sm font-mono font-bold text-slate-800">
+                <option value="USD/JPY" selected>USD/JPY</option>
+                <option value="USD/EUR">USD/EUR</option>
+                <option value="USD/AUD">USD/AUD</option>
+                <option value="LINK/JPY">LINK/JPY</option>
+                <option value="SOL/JPY">SOL/JPY</option>
+                <option value="BTC/JPY">BTC/JPY</option>
+                <option value="ETH/JPY">ETH/JPY</option>
+                <option value="기타" data-i18n="optCustom">その他 (直接入力)</option>
+              </select>
+              <input type="text" id="customPosSymbol" placeholder="Asset" oninput="updatePrincipalAndPosition()" class="hidden w-1/2 clay-input px-3 py-3 text-sm font-mono font-bold text-slate-800">
+            </div>
+            <p class="text-[11px] text-slate-400" data-i18n="hintAssetType">現在レバレッジポジションを保有しているペア</p>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700" data-i18n="labelAssetAmount">📦 保有資産数量</label>
+            <input type="number" id="posAmount" step="any" placeholder="50" oninput="updatePrincipalAndPosition()" class="w-full clay-input px-4 py-3 text-sm font-mono font-semibold text-slate-800">
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700" data-i18n="labelUnrealizedPnl">📈 未実現評価損益 (円)</label>
+            <input type="number" id="posUnrealizedPnl" placeholder="120040" oninput="updatePrincipalAndPosition()" class="w-full clay-input px-4 py-3 text-sm font-mono font-bold text-rose-500">
+          </div>
+
+          <div class="space-y-1.5 sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-700" data-i18n="labelMargin">🔒 拘束証拠金 (担保元本 円)</label>
+            <input type="number" id="posMargin" placeholder="220240" oninput="updatePrincipalAndPosition()" class="w-full clay-input px-4 py-3 text-sm font-mono font-semibold text-slate-800">
+          </div>
+        </div>
+
+        <div class="pt-4 flex justify-end">
+          <button onclick="navigate('dashboard')" class="clay-button text-white font-bold text-xs px-6 py-3 shadow-md" data-i18n="btnBackToDashboard">
+            ダッシュボードへ戻る
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 3: 월별 집계 뷰 (월별 합계 카드 & 테이블 합계 행 추가) ================= -->
+    <section id="view-monthly" class="hidden space-y-6">
+      
+      <!-- 1. 월별 누적 종합 합계 카드 (4 Cards) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="clay-card-peach p-5 rounded-3xl flex flex-col justify-between">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-bold text-rose-800" data-i18n="monthlySummaryTradePnl">累計 決済損益 (総額)</span>
+            <span class="text-base">📈</span>
+          </div>
+          <div class="my-2">
+            <div id="monthlyTotalTradePnl" class="text-xl lg:text-2xl font-black font-mono text-rose-600 tracking-tight">¥0</div>
+          </div>
+          <div class="text-[10px] font-semibold text-rose-700/80" data-i18n="monthlySummaryTradePnlSub">全決済トレード損益合算</div>
+        </div>
+
+        <div class="clay-card-amber p-5 rounded-3xl flex flex-col justify-between">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-bold text-amber-800" data-i18n="monthlySummaryFee">累計 管理手数料 (総額)</span>
+            <span class="text-base">⏳</span>
+          </div>
+          <div class="my-2">
+            <div id="monthlyTotalFee" class="text-xl lg:text-2xl font-black font-mono text-amber-600 tracking-tight">¥0</div>
+          </div>
+          <div class="text-[10px] font-semibold text-amber-700/80" data-i18n="monthlySummaryFeeSub">全ロールオーバー手数料合算</div>
+        </div>
+
+        <div class="clay-card-mint p-5 rounded-3xl flex flex-col justify-between">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-bold text-teal-800" data-i18n="monthlySummaryNetPnl">累計 月間純損益 (純額)</span>
+            <span class="text-base">💎</span>
+          </div>
+          <div class="my-2">
+            <div id="monthlyTotalNetPnl" class="text-xl lg:text-2xl font-black font-mono text-teal-900 tracking-tight">¥0</div>
+          </div>
+          <div class="text-[10px] font-semibold text-teal-700/80" data-i18n="monthlySummaryNetPnlSub">手数料差引後の確定純損益</div>
+        </div>
+
+        <div class="clay-card-sky p-5 rounded-3xl flex flex-col justify-between">
+          <div class="flex justify-between items-start">
+            <span class="text-xs font-bold text-sky-800" data-i18n="monthlySummaryEndBal">現在の確定残高</span>
+            <span class="text-base">🏦</span>
+          </div>
+          <div class="my-2">
+            <div id="monthlyCurrentBalance" class="text-xl lg:text-2xl font-black font-mono text-sky-900 tracking-tight">¥0</div>
+          </div>
+          <div class="text-[10px] font-semibold text-sky-700/80" data-i18n="monthlySummaryEndBalSub">最新確定口座残高</div>
+        </div>
+      </div>
+
+      <!-- 2. 월별 집계 테이블 (하단 종합계 행 포함) -->
+      <div class="clay-card p-6 shadow">
+        <h3 class="text-sm font-bold text-slate-800 mb-4" data-i18n="monthlyTableTitle">📅 月別収益および手数料総合集計表</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-100 font-bold">
+              <tr>
+                <th class="p-3.5" data-i18n="thMonth">月 (Month)</th>
+                <th class="p-3.5 text-right" data-i18n="thTradePnl">決済損益 (円)</th>
+                <th class="p-3.5 text-right" data-i18n="thFee">管理手数料 (円)</th>
+                <th class="p-3.5 text-right" data-i18n="thNetPnl">月間純損益 (円)</th>
+                <th class="p-3.5 text-right" data-i18n="thEndBal">期末確定残高 (円)</th>
+                <th class="p-3.5 text-right" data-i18n="thRoi">月間収益率 (%)</th>
+              </tr>
+            </thead>
+            <tbody id="monthlyTableBody" class="divide-y divide-slate-100"></tbody>
+            <tfoot id="monthlyTableFoot" class="border-t-2 border-slate-200 bg-slate-50/80 font-bold"></tfoot>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= VIEW 4: 일별 상세 내역 뷰 ================= -->
+    <section id="view-daily" class="hidden space-y-6">
+      <div class="clay-card p-6 space-y-6">
+        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-3">
+          <div class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+            <span>➕</span> <span data-i18n="dailyAddTitle">日別詳細データの直接追加</span>
+          </div>
+          <form onsubmit="addManualDailyRecord(event)" class="grid grid-cols-2 sm:grid-cols-6 gap-3 text-xs">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 mb-1" data-i18n="thDate">日付</label>
+              <input type="date" id="newRecDate" required class="w-full clay-input px-2.5 py-1.5 text-slate-700">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 mb-1" data-i18n="thSymbol">取引資産</label>
+              <input type="text" id="newRecSymbol" placeholder="USD/JPY" value="USD/JPY" class="w-full clay-input px-2.5 py-1.5 text-slate-700">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 mb-1" data-i18n="thTradePnl">決済損益 (円)</label>
+              <input type="number" id="newRecTradePnl" placeholder="0" value="0" class="w-full clay-input px-2.5 py-1.5 text-slate-700 font-mono">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 mb-1" data-i18n="thFee">当日手数料 (円)</label>
+              <input type="number" id="newRecFee" placeholder="120" value="0" class="w-full clay-input px-2.5 py-1.5 text-slate-700 font-mono">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 mb-1" data-i18n="thDailyBal">当日残高 (円)</label>
+              <input type="number" id="newRecBalance" placeholder="239585" class="w-full clay-input px-2.5 py-1.5 text-slate-700 font-mono">
+            </div>
+            <div class="flex items-end">
+              <button type="submit" class="w-full clay-button text-white font-bold py-2 rounded-xl text-xs" data-i18n="btnAddRecord">
+                追加する
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 border-b border-slate-100 font-bold">
+              <tr>
+                <th class="p-3.5" data-i18n="thDate">日付</th>
+                <th class="p-3.5" data-i18n="thSymbol">取引資産</th>
+                <th class="p-3.5 text-right" data-i18n="thTradePnl">決済損益 (円)</th>
+                <th class="p-3.5 text-right" data-i18n="thFee">当日手数料 (円)</th>
+                <th class="p-3.5 text-right" data-i18n="thNetPnl">日別純損益 (円)</th>
+                <th class="p-3.5 text-right" data-i18n="thDailyBal">当日残高 (円)</th>
+                <th class="p-3.5 text-center w-28" data-i18n="thAction">操作</th>
+              </tr>
+            </thead>
+            <tbody id="dailyTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIEW 5: 백업 (추출 / 반영) 뷰 ================= -->
+    <section id="view-backup" class="hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl">
+        <div class="clay-card p-6 space-y-4">
+          <div class="flex items-center gap-2 text-teal-600">
+            <span class="text-xl">📤</span>
+            <h3 class="text-sm font-extrabold text-slate-800" data-i18n="backupExportTitle">データバックアップ抽出 (エクスポート)</h3>
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed" data-i18n="backupExportDesc">
+            保存されているすべての取引データ、初期設定、未実現ポジションを安全なJSONファイルとして書き出します。
+          </p>
+          <div class="pt-2 space-y-2.5">
+            <button onclick="exportBackupJSON()" class="w-full clay-button text-white font-bold py-3 px-4 text-xs transition flex items-center justify-center gap-2">
+              <span>💾</span> <span data-i18n="btnDownloadJson">全体バックアップファイルをダウンロード (.json)</span>
+            </button>
+            <button onclick="exportCSV()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold border border-slate-200 py-3 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
+              <span>📊</span> <span data-i18n="btnExportCsv">Excel / スプレッドシート用出力 (.csv)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="clay-card p-6 space-y-4">
+          <div class="flex items-center gap-2 text-purple-600">
+            <span class="text-xl">📥</span>
+            <h3 class="text-sm font-extrabold text-slate-800" data-i18n="backupImportTitle">データバックアップ反映 (インポート)</h3>
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed" data-i18n="backupImportDesc">
+            以前保存したJSONバックアップファイルを選択して、すべてのデータを復元します。
+          </p>
+          <div class="pt-2">
+            <label class="cursor-pointer w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold py-3 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-md shadow-purple-200">
+              <span>📂</span> <span data-i18n="btnUploadJson">バックアップファイルを選択して復元 (.json)</span>
+              <input type="file" id="backupFileInput" accept=".json" class="hidden" onchange="importBackupJSON(event)">
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'gmo_leverage_parsed_records_v7';
+    const POSITION_STORAGE_KEY = 'gmo_leverage_manual_position_v6';
+    const LANG_STORAGE_KEY = 'gmo_leverage_lang_v4';
+
+    let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || 'ja';
+    let lineChart = null;
+    let donutChart = null;
+    let editingDate = null;
+    let manualPrincipalOverride = false;
+
+    // 5개 국어 번역 사전
+    const i18n = {
+      ja: {
+        appTitle: 'レバレッジ資産管理',
+        navDashboard: 'ダッシュボード',
+        navSettings: '資産設定',
+        navMonthly: '月別集計',
+        navDaily: '日別詳細',
+        navBackup: 'バックアップ',
+        storageStatusTitle: 'データ保存先',
+        storageStatusSafe: '● ローカル保管',
+        storageStatusDesc: 'すべての取引データが端末に安全に保存されています。',
+        btnResetAll: 'すべてのデータを初期化',
+        viewTitleDashboard: '総合ダッシュボード',
+        viewTitleSettings: '資産およびポジション設定',
+        viewTitleMonthly: '月別精算集計表',
+        viewTitleDaily: '日別詳細取引履歴',
+        viewTitleBackup: 'データバックアップおよび復元',
+        filterAllAssets: '全資産総合',
+        btnCsvUpload: 'CSV 添付',
+        btnPasteText: 'テキスト貼付',
+        popupPasteTitle: '取引履歴データの入力',
+        popupBtnAnalyze: '分析および反映',
+        kpiNetWorthTitle: '実質総資産',
+        kpiNetWorthSub: '残高+含み損益合算',
+        kpiPrincipalTitle: '初期投資元本',
+        kpiPrincipalSub: '総資産 - 総損益 (自動算出)',
+        kpiTotalProfitTitle: '累積総損益',
+        kpiTotalProfitSub: '確定損益 + 含み損益',
+        kpiTotalFeeTitle: '累積管理手数料',
+        kpiTotalFeeSub: '06:00 ロールオーバー費',
+        kpiUnrealizedTitle: '未実現損益 (含み益)',
+        kpiUnrealizedSub: '保有ポジション評価額',
+        kpiBalanceTitle: '確定日本円残高',
+        kpiBalanceSub: '最新精算データ基準',
+        kpiRoiTitle: '元本対比収益率',
+        kpiRoiSub: '総損益 ÷ 初期元本',
+        chartMainTitle: '📈 日別累積確定損益および残高推移',
+        badgeAutoSync: 'リアルタイム連動',
+        chartDonutTitle: '🪙 銘柄別実現損益シェア',
+        recentTransactionsTitle: '直近の取引履歴 (最新 5件)',
+        btnViewAllDaily: 'すべて見る',
+        settingsTitle: '投資元本および現在ポジション設定',
+        settingsDesc: '初期投資元本は「実質総資産 - 累積総損益」から自動逆算されます。保有ポジションの含み損益を更新してください。',
+        labelPrincipal: '💰 初期投資元本 (円 - 自動計算連動)',
+        hintPrincipalAuto: '※ 空欄時は「実質総資産 - 累積総損益」が自動適用されます',
+        labelAssetType: '💼 保有資産の種類',
+        hintAssetType: '現在レバレッジポジションを保有しているペア',
+        optCustom: 'その他 (直接入力)',
+        labelAssetAmount: '📦 保有資産数量',
+        labelUnrealizedPnl: '📈 未実現評価損益 (円)',
+        labelMargin: '🔒 拘束証拠金 (担保元本 円)',
+        btnBackToDashboard: 'ダッシュボードへ戻る',
+        monthlyTableTitle: '📅 月別収益および手数料総合集計表',
+        monthlySummaryTradePnl: '累計 決済損益 (総額)',
+        monthlySummaryTradePnlSub: '全決済トレード損益合算',
+        monthlySummaryFee: '累計 管理手数料 (総額)',
+        monthlySummaryFeeSub: '全ロールオーバー手数料合算',
+        monthlySummaryNetPnl: '累計 月間純損益 (純額)',
+        monthlySummaryNetPnlSub: '手数料差引後の確定純損益',
+        monthlySummaryEndBal: '現在の確定残高',
+        monthlySummaryEndBalSub: '最新確定口座残高',
+        thTotalRow: '総合計 (Total)',
+        thMonth: '月 (Month)',
+        thTradePnl: '決済損益 (円)',
+        thFee: '管理手数料 (円)',
+        thNetPnl: '月間純損益 (円)',
+        thEndBal: '期末確定残高 (円)',
+        thRoi: '月間収益率 (%)',
+        dailyAddTitle: '日別詳細データの直接追加',
+        thDate: '日付',
+        thSymbol: '取引資産',
+        thDailyBal: '当日残高 (円)',
+        thAction: '操作',
+        btnAddRecord: '追加する',
+        backupExportTitle: 'データバックアップ抽出 (エクスポート)',
+        backupExportDesc: '保存されているすべての取引データ、初期設定、未実現ポジションを安全なJSONファイルとして書き出します。',
+        btnDownloadJson: '全体バックアップファイルをダウンロード (.json)',
+        btnExportCsv: 'Excel / スプレッドシート用出力 (.csv)',
+        backupImportTitle: 'データバックアップ反映 (インポート)',
+        backupImportDesc: '以前保存したJSONバックアップファイルを選択して、すべてのデータを復元します。',
+        btnUploadJson: 'バックアップファイルを選択して復元 (.json)',
+        msgResetConfirm: '保存されているすべての取引履歴と設定データを初期化しますか？',
+        msgDeleteConfirm: 'の取引履歴を削除しますか？',
+        msgSuccessImport: '件の取引履歴を正常に反映しました！',
+        msgSuccessBackup: 'バックアップデータを正常に復元しました！',
+        msgInvalidFormat: 'データ形式を認識できませんでした。CSVまたはテキストを確認してください。',
+        noDataText: 'データがありません。CSVをアップロードするか直接追加してください。',
+        chartLabelNetPnl: '累積純損益 (円)',
+        chartLabelBalance: '確定残高 (円)',
+        btnEdit: '編集',
+        btnDelete: '削除',
+        btnSave: '保存',
+        btnCancel: 'キャンセル'
+      },
+      en: {
+        appTitle: 'Leverage Asset Manager',
+        navDashboard: 'Dashboard',
+        navSettings: 'Asset Settings',
+        navMonthly: 'Monthly Summary',
+        navDaily: 'Daily Details',
+        navBackup: 'Backup',
+        storageStatusTitle: 'Data Storage',
+        storageStatusSafe: '● Local Secure Storage',
+        storageStatusDesc: 'All transaction data is safely saved on your device.',
+        btnResetAll: 'Reset All Data',
+        viewTitleDashboard: 'Comprehensive Dashboard',
+        viewTitleSettings: 'Asset & Position Settings',
+        viewTitleMonthly: 'Monthly Summary Table',
+        viewTitleDaily: 'Daily Detailed Transactions',
+        viewTitleBackup: 'Data Backup & Restore',
+        filterAllAssets: 'All Assets Total',
+        btnCsvUpload: 'Upload CSV',
+        btnPasteText: 'Paste Text',
+        popupPasteTitle: 'Input Transaction History',
+        popupBtnAnalyze: 'Analyze & Apply',
+        kpiNetWorthTitle: 'Real Net Worth',
+        kpiNetWorthSub: 'Balance + Unrealized PnL',
+        kpiPrincipalTitle: 'Initial Principal',
+        kpiPrincipalSub: 'Net Worth - Total Profit (Auto)',
+        kpiTotalProfitTitle: 'Cumulative Net Profit',
+        kpiTotalProfitSub: 'Realized + Unrealized PnL',
+        kpiTotalFeeTitle: 'Cumulative Fees',
+        kpiTotalFeeSub: '06:00 Rollover Fee Total',
+        kpiUnrealizedTitle: 'Unrealized PnL',
+        kpiUnrealizedSub: 'Current Open Position Value',
+        kpiBalanceTitle: 'Settled JPY Balance',
+        kpiBalanceSub: 'Based on Latest Settlement',
+        kpiRoiTitle: 'Return on Investment (ROI)',
+        kpiRoiSub: 'Total Profit ÷ Principal',
+        chartMainTitle: '📈 Cumulative Net Profit & Balance Trend',
+        badgeAutoSync: 'Real-time Sync',
+        chartDonutTitle: '🪙 Realized Profit by Asset',
+        recentTransactionsTitle: 'Recent Transactions (Latest 5)',
+        btnViewAllDaily: 'View All',
+        settingsTitle: 'Principal & Open Position Settings',
+        settingsDesc: 'Principal is auto-calculated as [Net Worth - Total Profit]. Please update your open position unrealized PnL.',
+        labelPrincipal: '💰 Initial Principal (JPY - Auto Calc)',
+        hintPrincipalAuto: '※ If blank, [Net Worth - Total Profit] is automatically applied.',
+        labelAssetType: '💼 Holding Asset Type',
+        hintAssetType: 'Currently maintained leverage pair',
+        optCustom: 'Other (Custom Input)',
+        labelAssetAmount: '📦 Asset Quantity',
+        labelUnrealizedPnl: '📈 Unrealized PnL (JPY)',
+        labelMargin: '🔒 Restricted Margin (JPY)',
+        btnBackToDashboard: 'Back to Dashboard',
+        monthlyTableTitle: '📅 Monthly Profit & Fee Breakdown',
+        monthlySummaryTradePnl: 'Total Settled PnL',
+        monthlySummaryTradePnlSub: 'Sum of all trade settlement PnL',
+        monthlySummaryFee: 'Total Fees',
+        monthlySummaryFeeSub: 'Sum of all rollover fees',
+        monthlySummaryNetPnl: 'Total Net Profit',
+        monthlySummaryNetPnlSub: 'Net profit after fee deduction',
+        monthlySummaryEndBal: 'Current Settled Balance',
+        monthlySummaryEndBalSub: 'Latest settled balance in JPY',
+        thTotalRow: 'Grand Total',
+        thMonth: 'Month',
+        thTradePnl: 'Settled PnL (JPY)',
+        thFee: 'Management Fee (JPY)',
+        thNetPnl: 'Monthly Net (JPY)',
+        thEndBal: 'Ending Balance (JPY)',
+        thRoi: 'Monthly ROI (%)',
+        dailyAddTitle: 'Add Daily Record Manually',
+        thDate: 'Date',
+        thSymbol: 'Asset Pair',
+        thDailyBal: 'Daily Balance (JPY)',
+        thAction: 'Action',
+        btnAddRecord: 'Add Record',
+        backupExportTitle: 'Export Backup Data',
+        backupExportDesc: 'Export all records, settings, and position data into a secure JSON file.',
+        btnDownloadJson: 'Download Full Backup File (.json)',
+        btnExportCsv: 'Export to Spreadsheet (.csv)',
+        backupImportTitle: 'Import Backup Data',
+        backupImportDesc: 'Select a previously saved JSON backup file to restore all data.',
+        btnUploadJson: 'Select Backup File & Restore (.json)',
+        msgResetConfirm: 'Are you sure you want to reset all stored records and settings?',
+        msgDeleteConfirm: 'Are you sure you want to delete the record of',
+        msgSuccessImport: ' transactions have been successfully applied!',
+        msgSuccessBackup: 'Backup data has been successfully restored!',
+        msgInvalidFormat: 'Invalid format. Please check your CSV or pasted text.',
+        noDataText: 'No data available. Please upload a CSV or add daily records.',
+        chartLabelNetPnl: 'Cumulative Net PnL (JPY)',
+        chartLabelBalance: 'Settled Balance (JPY)',
+        btnEdit: 'Edit',
+        btnDelete: 'Delete',
+        btnSave: 'Save',
+        btnCancel: 'Cancel'
+      },
+      ko: {
+        appTitle: '레버리지 자산관리',
+        navDashboard: '대시보드',
+        navSettings: '자산 설정',
+        navMonthly: '월별 집계',
+        navDaily: '일별 상세 내역',
+        navBackup: '백업 (추출/반영)',
+        storageStatusTitle: '데이터 저장소',
+        storageStatusSafe: '● 로컬 안전 보관',
+        storageStatusDesc: '모든 거래 데이터가 브라우저에 안전하게 보관 중입니다.',
+        btnResetAll: '전체 데이터 초기화',
+        viewTitleDashboard: '종합 대시보드',
+        viewTitleSettings: '자산 및 포지션 설정',
+        viewTitleMonthly: '월별 정산 집계표',
+        viewTitleDaily: '일별 상세 거래 내역',
+        viewTitleBackup: '데이터 백업 및 복원',
+        filterAllAssets: '전체 자산 종합',
+        btnCsvUpload: 'CSV 첨부',
+        btnPasteText: '텍스트 붙여넣기',
+        popupPasteTitle: '거래내역 데이터 입력',
+        popupBtnAnalyze: '분석 및 반영',
+        kpiNetWorthTitle: '실질 총자산',
+        kpiNetWorthSub: '잔고 + 미실현 손익 합산',
+        kpiPrincipalTitle: '초기 투자 원금',
+        kpiPrincipalSub: '총자산 - 총손익 (자동 역산)',
+        kpiTotalProfitTitle: '누적 총수익',
+        kpiTotalProfitSub: '확정 손익 + 미실현 손익',
+        kpiTotalFeeTitle: '누적 관리수수료',
+        kpiTotalFeeSub: '06:00 롤오버 피 합산',
+        kpiUnrealizedTitle: '미실현 수익 (평가손익)',
+        kpiUnrealizedSub: '보유 포지션 평가액',
+        kpiBalanceTitle: '확정 엔화 잔고',
+        kpiBalanceSub: '최신 정산 잔액 기준',
+        kpiRoiTitle: '원금 대비 수익률',
+        kpiRoiSub: '총수익 ÷ 초기 원금',
+        chartMainTitle: '📈 일별 누적 확정손익 및 계좌 잔고 추이',
+        badgeAutoSync: '실시간 자동 연동',
+        chartDonutTitle: '🪙 종목별 실현손익 비중',
+        recentTransactionsTitle: '최근 거래 내역 (최신 5건)',
+        btnViewAllDaily: '전체 보기',
+        settingsTitle: '투자 원금 및 현재 포지션 설정',
+        settingsDesc: '초기 투자 원금은 [실질 총자산 - 누적 총수익] 공식으로 자동 역산됩니다. 미실현 손익을 업데이트하세요.',
+        labelPrincipal: '💰 초기 투자 원금 (円 - 자동 계산 연동)',
+        hintPrincipalAuto: '※ 비워둘 경우 [실질 총자산 - 누적 총수익]이 자동 계산됩니다',
+        labelAssetType: '💼 보유 자산 종류',
+        hintAssetType: '현재 레버리지 포지션을 보유 중인 페어',
+        optCustom: '기타 (직접 입력)',
+        labelAssetAmount: '📦 보유 자산 수량',
+        labelUnrealizedPnl: '📈 미실현 평가손익 (円)',
+        labelMargin: '🔒 구속증거금 (담보 원금 円)',
+        btnBackToDashboard: '대시보드로 돌아가기',
+        monthlyTableTitle: '📅 월별 수익 및 수수료 종합 집계표',
+        monthlySummaryTradePnl: '누적 결제손익 (총액)',
+        monthlySummaryTradePnlSub: '전체 청산 트레이딩 손익 합계',
+        monthlySummaryFee: '누적 관리수수료 (총액)',
+        monthlySummaryFeeSub: '전체 롤오버 수수료 합계',
+        monthlySummaryNetPnl: '누적 월간 순손익 (순액)',
+        monthlySummaryNetPnlSub: '수수료 차감 후 확정 순손익',
+        monthlySummaryEndBal: '현재 확정 잔고',
+        monthlySummaryEndBalSub: '최신 확정 계좌 엔화 잔액',
+        thTotalRow: '총합계 (Total)',
+        thMonth: '월 (Month)',
+        thTradePnl: '청산 손익 (円)',
+        thFee: '관리 수수료 (円)',
+        thNetPnl: '월간 순손익 (円)',
+        thEndBal: '기말 확정 잔고 (円)',
+        thRoi: '월간 수익률 (%)',
+        dailyAddTitle: '일별 상세 내역 직접 추가',
+        thDate: '날짜',
+        thSymbol: '거래 자산',
+        thDailyBal: '당일 잔고 (円)',
+        thAction: '관리',
+        btnAddRecord: '추가하기',
+        backupExportTitle: '데이터 백업 추출 (내보내기)',
+        backupExportDesc: '저장된 모든 거래 내역과 초기 설정, 미실현 포지션을 JSON 파일로 안전하게 다운로드합니다.',
+        btnDownloadJson: '전체 백업 파일 다운로드 (.json)',
+        btnExportCsv: 'Excel / 스프레드시트용 내보내기 (.csv)',
+        backupImportTitle: '데이터 백업 반영 (불러오기)',
+        backupImportDesc: '이전에 저장해 둔 JSON 백업 파일을 선택하여 모든 데이터를 복구합니다.',
+        btnUploadJson: '백업 파일 선택 및 복원 (.json)',
+        msgResetConfirm: '저장된 모든 거래 내역과 입력 데이터를 초기화하시겠습니까?',
+        msgDeleteConfirm: '의 거래 내역을 삭제하시겠습니까?',
+        msgSuccessImport: '건의 거래 내역을 성공적으로 반영했습니다!',
+        msgSuccessBackup: '백업 데이터를 성공적으로 복원했습니다!',
+        msgInvalidFormat: '데이터 형식을 인식하지 못했습니다. CSV나 텍스트를 확인해 주세요.',
+        noDataText: '데이터가 없습니다. CSV를 업로드하거나 직접 추가해 주세요.',
+        chartLabelNetPnl: '누적 순손익 (円)',
+        chartLabelBalance: '확정 잔고 (円)',
+        btnEdit: '수정',
+        btnDelete: '삭제',
+        btnSave: '저장',
+        btnCancel: '취소'
+      },
+      zh: {
+        appTitle: '杠杆资产管理系统',
+        navDashboard: '仪表盘',
+        navSettings: '资产设置',
+        navMonthly: '月度汇总',
+        navDaily: '每日明细',
+        navBackup: '数据备份',
+        storageStatusTitle: '数据存储',
+        storageStatusSafe: '● 本地安全存储',
+        storageStatusDesc: '所有交易数据均安全保存在您的本地浏览器中。',
+        btnResetAll: '重置所有数据',
+        viewTitleDashboard: '综合仪表盘',
+        viewTitleSettings: '资产与仓位设置',
+        viewTitleMonthly: '月度结算汇总表',
+        viewTitleDaily: '每日详细交易记录',
+        viewTitleBackup: '数据备份与恢复',
+        filterAllAssets: '全部资产汇总',
+        btnCsvUpload: '上传 CSV',
+        btnPasteText: '粘贴文本',
+        popupPasteTitle: '输入交易记录数据',
+        popupBtnAnalyze: '分析并应用',
+        kpiNetWorthTitle: '实际总资产',
+        kpiNetWorthSub: '余额 + 未实现盈亏',
+        kpiPrincipalTitle: '初始投资本金',
+        kpiPrincipalSub: '总资产 - 总盈亏 (自动计算)',
+        kpiTotalProfitTitle: '累计总盈亏',
+        kpiTotalProfitSub: '已实现盈亏 + 浮动盈亏',
+        kpiTotalFeeTitle: '累计管理费',
+        kpiTotalFeeSub: '06:00 隔夜费汇总',
+        kpiUnrealizedTitle: '未实现盈亏 (浮动盈亏)',
+        kpiUnrealizedSub: '当前持仓评估额',
+        kpiBalanceTitle: '已结算日元余额',
+        kpiBalanceSub: '基于最新结算数据',
+        kpiRoiTitle: '本金收益率 (ROI)',
+        kpiRoiSub: '总盈亏 ÷ 初始本金',
+        chartMainTitle: '📈 每日累计已实现盈亏与余额走势',
+        badgeAutoSync: '实时同步',
+        chartDonutTitle: '🪙 各币种已实现盈亏占比',
+        recentTransactionsTitle: '近期交易明细 (最新 5条)',
+        btnViewAllDaily: '查看全部',
+        settingsTitle: '本金与当前持仓设置',
+        settingsDesc: '初始本金根据 [实际总资产 - 累计总盈亏] 自动反算。请更新当前持仓的浮动盈亏。',
+        labelPrincipal: '💰 初始投资本金 (日元 - 自动计算)',
+        hintPrincipalAuto: '※ 留空时将自动应用 [实际总资产 - 累计总盈亏]',
+        labelAssetType: '💼 持有资产类型',
+        hintAssetType: '当前持有杠杆仓位的交易对',
+        optCustom: '其他 (直接输入)',
+        labelAssetAmount: '📦 持有资产数量',
+        labelUnrealizedPnl: '📈 未实现浮动盈亏 (日元)',
+        labelMargin: '🔒 占用保证金 (本金 日元)',
+        btnBackToDashboard: '返回仪表盘',
+        monthlyTableTitle: '📅 月度收益与手续费汇总表',
+        monthlySummaryTradePnl: '累计 结算盈亏 (总额)',
+        monthlySummaryTradePnlSub: '所有平仓交易盈亏总和',
+        monthlySummaryFee: '累计 管理费 (总额)',
+        monthlySummaryFeeSub: '所有隔夜手续费总和',
+        monthlySummaryNetPnl: '累计 月度净盈亏 (净额)',
+        monthlySummaryNetPnlSub: '扣除手续费后的净盈亏',
+        monthlySummaryEndBal: '当前结算余额',
+        monthlySummaryEndBalSub: '最新日元账户余额',
+        thTotalRow: '总计 (Total)',
+        thMonth: '月份',
+        thTradePnl: '结算盈亏 (日元)',
+        thFee: '管理手续费 (日元)',
+        thNetPnl: '月度净盈亏 (日元)',
+        thEndBal: '期末结算余额 (日元)',
+        thRoi: '月度收益率 (%)',
+        dailyAddTitle: '直接添加每日详细数据',
+        thDate: '日期',
+        thSymbol: '交易资产',
+        thDailyBal: '当日余额 (日元)',
+        thAction: '操作',
+        btnAddRecord: '添加记录',
+        backupExportTitle: '数据备份导出',
+        backupExportDesc: '将所有保存的交易数据、设置和持仓信息导出为安全的 JSON 文件。',
+        btnDownloadJson: '下载完整备份文件 (.json)',
+        btnExportCsv: '导出表格文件 (.csv)',
+        backupImportTitle: '数据备份导入',
+        backupImportDesc: '选择之前保存的 JSON 备份文件以恢复所有数据。',
+        btnUploadJson: '选择备份文件并恢复 (.json)',
+        msgResetConfirm: '确定要重置所有保存的交易记录和设置吗？',
+        msgDeleteConfirm: '的交易记录吗？',
+        msgSuccessImport: '条交易记录已成功应用！',
+        msgSuccessBackup: '备份数据已成功恢复！',
+        msgInvalidFormat: '无法识别数据格式，请检查 CSV 或文本内容。',
+        noDataText: '暂无数据。请上传 CSV 或直接添加每日记录。',
+        chartLabelNetPnl: '累计净盈亏 (日元)',
+        chartLabelBalance: '结算余额 (日元)',
+        btnEdit: '编辑',
+        btnDelete: '删除',
+        btnSave: '保存',
+        btnCancel: '取消'
+      },
+      es: {
+        appTitle: 'Gestor de Activos con Apalancamiento',
+        navDashboard: 'Panel Principal',
+        navSettings: 'Ajuste de Activos',
+        navMonthly: 'Resumen Mensual',
+        navDaily: 'Detalles Diarios',
+        navBackup: 'Copia de Seguridad',
+        storageStatusTitle: 'Almacenamiento',
+        storageStatusSafe: '● Guardado Local Seguro',
+        storageStatusDesc: 'Todos los datos están guardados de forma segura en su navegador.',
+        btnResetAll: 'Restablecer Todo',
+        viewTitleDashboard: 'Panel General',
+        viewTitleSettings: 'Configuración de Activos y Posición',
+        viewTitleMonthly: 'Tabla de Resumen Mensual',
+        viewTitleDaily: 'Transacciones Diarias Detalladas',
+        viewTitleBackup: 'Copia de Seguridad y Restauración',
+        filterAllAssets: 'Todos los Activos',
+        btnCsvUpload: 'Adjuntar CSV',
+        btnPasteText: 'Pegar Texto',
+        popupPasteTitle: 'Entrada de Historial de Transacciones',
+        popupBtnAnalyze: 'Analizar y Aplicar',
+        kpiNetWorthTitle: 'Patrimonio Neto Real',
+        kpiNetWorthSub: 'Saldo + Ganancia No Realizada',
+        kpiPrincipalTitle: 'Capital Inicial',
+        kpiPrincipalSub: 'Patrimonio - Ganancia Total (Auto)',
+        kpiTotalProfitTitle: 'Ganancia Neta Acumulada',
+        kpiTotalProfitSub: 'Realizada + No Realizada',
+        kpiTotalFeeTitle: 'Comisiones Acumuladas',
+        kpiTotalFeeSub: 'Tarifa Rollover 06:00 Total',
+        kpiUnrealizedTitle: 'Ganancia No Realizada',
+        kpiUnrealizedSub: 'Valor de Posición Abierta',
+        kpiBalanceTitle: 'Saldo Liquidado en JPY',
+        kpiBalanceSub: 'Basado en Última Liquidación',
+        kpiRoiTitle: 'Rentabilidad (ROI)',
+        kpiRoiSub: 'Ganancia Total ÷ Capital',
+        chartMainTitle: '📈 Tendencia de Ganancia Neta Acumulada y Saldo',
+        badgeAutoSync: 'Sincronización en Tiempo Real',
+        chartDonutTitle: '🪙 Ganancia Realizada por Activo',
+        recentTransactionsTitle: 'Transacciones Recientes (Últimas 5)',
+        btnViewAllDaily: 'Ver Todo',
+        settingsTitle: 'Ajuste de Capital y Posición Abierta',
+        settingsDesc: 'El capital se calcula automáticamente como [Patrimonio - Ganancia Total]. Actualice su ganancia no realizada.',
+        labelPrincipal: '💰 Capital Inicial (JPY - Auto)',
+        hintPrincipalAuto: '※ Si está vacío, se aplica automáticamente [Patrimonio - Ganancia Total].',
+        labelAssetType: '💼 Tipo de Activo',
+        hintAssetType: 'Par de apalancamiento actualmente mantenido',
+        optCustom: 'Otro (Entrada Manual)',
+        labelAssetAmount: '📦 Cantidad de Activo',
+        labelUnrealizedPnl: '📈 Ganancia No Realizada (JPY)',
+        labelMargin: '🔒 Margen Restringido (JPY)',
+        btnBackToDashboard: 'Volver al Panel',
+        monthlyTableTitle: '📅 Desglose Mensual de Ganancias y Tarifas',
+        monthlySummaryTradePnl: 'Ganancia Liquidada Total',
+        monthlySummaryTradePnlSub: 'Suma de liquidaciones de operaciones',
+        monthlySummaryFee: 'Comisiones Totales',
+        monthlySummaryFeeSub: 'Suma de tarifas de rollover',
+        monthlySummaryNetPnl: 'Ganancia Neta Total',
+        monthlySummaryNetPnlSub: 'Ganancia neta tras comisiones',
+        monthlySummaryEndBal: 'Saldo Liquidado Actual',
+        monthlySummaryEndBalSub: 'Último saldo en JPY',
+        thTotalRow: 'Total General',
+        thMonth: 'Mes',
+        thTradePnl: 'Ganancia Liquidada (JPY)',
+        thFee: 'Comisión de Gestión (JPY)',
+        thNetPnl: 'Neto Mensual (JPY)',
+        thEndBal: 'Saldo Final (JPY)',
+        thRoi: 'ROI Mensual (%)',
+        dailyAddTitle: 'Añadir Registro Diario Manualmente',
+        thDate: 'Fecha',
+        thSymbol: 'Par de Activo',
+        thDailyBal: 'Saldo Diario (JPY)',
+        thAction: 'Acción',
+        btnAddRecord: 'Añadir Registro',
+        backupExportTitle: 'Exportar Copia de Seguridad',
+        backupExportDesc: 'Exporte todos los registros, ajustes y posiciones en un archivo JSON seguro.',
+        btnDownloadJson: 'Descargar Copia Completa (.json)',
+        btnExportCsv: 'Exportar a Hoja de Cálculo (.csv)',
+        backupImportTitle: 'Importar Copia de Seguridad',
+        backupImportDesc: 'Seleccione un archivo JSON previamente guardado para restaurar todos los datos.',
+        btnUploadJson: 'Seleccionar Archivo y Restaurar (.json)',
+        msgResetConfirm: '¿Está seguro de que desea restablecer todos los registros y ajustes?',
+        msgDeleteConfirm: '¿Desea eliminar el registro de',
+        msgSuccessImport: '¡transacciones aplicadas con éxito!',
+        msgSuccessBackup: '¡Datos de copia de seguridad restaurados con éxito!',
+        msgInvalidFormat: 'Formato no reconocido. Verifique el CSV o texto pegado.',
+        noDataText: 'No hay datos disponibles. Suba un CSV o añada registros diarios.',
+        chartLabelNetPnl: 'Ganancia Neta Acumulada (JPY)',
+        chartLabelBalance: 'Saldo Liquidado (JPY)',
+        btnEdit: 'Editar',
+        btnDelete: 'Eliminar',
+        btnSave: 'Guardar',
+        btnCancel: 'Cancelar'
+      }
+    };
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem(LANG_STORAGE_KEY, lang);
+      
+      ['ja', 'en', 'ko', 'zh', 'es'].forEach(l => {
+        const btn = document.getElementById(`lang-${l}`);
+        if (btn) {
+          if (l === lang) {
+            btn.className = 'px-2.5 py-1.5 rounded-xl text-xs font-black bg-sky-50 text-sky-600 transition';
+          } else {
+            btn.className = 'px-2.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-700 transition';
+          }
+        }
+      });
+
+      applyTranslations();
+      render();
+    }
+
+    function applyTranslations() {
+      const dict = i18n[currentLang] || i18n.ja;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+    }
+
+    function navigate(viewId) {
+      ['dashboard', 'settings', 'monthly', 'daily', 'backup'].forEach(v => {
+        const sec = document.getElementById(`view-${v}`);
+        const nav = document.getElementById(`nav-${v}`);
+        if (v === viewId) {
+          sec.classList.remove('hidden');
+          nav.className = 'w-full flex items-center gap-4 menu-item-large bg-sky-50 text-sky-600 shadow-sm transition';
+        } else {
+          sec.classList.add('hidden');
+          nav.className = 'w-full flex items-center gap-4 menu-item-large text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition';
+        }
+      });
+
+      const dict = i18n[currentLang] || i18n.ja;
+      const titleMap = {
+        dashboard: `📊 ${dict.viewTitleDashboard}`,
+        settings: `⚙️ ${dict.viewTitleSettings}`,
+        monthly: `📅 ${dict.viewTitleMonthly}`,
+        daily: `📆 ${dict.viewTitleDaily}`,
+        backup: `💾 ${dict.viewTitleBackup}`
+      };
+      document.getElementById('viewTitle').innerHTML = titleMap[viewId];
+      
+      const dashFilter = document.getElementById('dashboardAssetFilter');
+      if (viewId === 'dashboard') {
+        dashFilter.classList.remove('hidden');
+        setTimeout(() => render(), 50);
+      } else {
+        dashFilter.classList.add('hidden');
+      }
+    }
+
+    function togglePastePopup() {
+      document.getElementById('pastePopup').classList.toggle('hidden');
+    }
+
+    function formatYen(num) {
+      const sign = num > 0 ? '+' : '';
+      return `${sign}${Math.round(num).toLocaleString()} 円`;
+    }
+
+    function cleanNumber(val) {
+      if (!val) return 0;
+      let str = String(val).trim();
+      if (str === '-' || str === '- 円' || str === '円') return 0;
+      const isNegative = str.includes('-');
+      const numStr = str.replace(/[^0-9.]/g, '');
+      if (!numStr) return 0;
+      const num = Number(numStr);
+      return isNegative ? -num : num;
+    }
+
+    function handlePosSymbolChange() {
+      const select = document.getElementById('posSymbol');
+      const customInput = document.getElementById('customPosSymbol');
+      if (select.value === '기타') {
+        customInput.classList.remove('hidden');
+      } else {
+        customInput.classList.add('hidden');
+      }
+      updatePrincipalAndPosition();
+    }
+
+    function updatePrincipalAndPosition(isManual = false) {
+      if (isManual) manualPrincipalOverride = true;
+      const principalInput = document.getElementById('principalAmount').value;
+      const principal = principalInput !== '' ? Number(principalInput) : null;
+      const selectVal = document.getElementById('posSymbol').value;
+      const symbol = selectVal === '기타' ? (document.getElementById('customPosSymbol').value || '기타') : selectVal;
+      const amount = Number(document.getElementById('posAmount').value) || 0;
+      const unrealizedPnl = Number(document.getElementById('posUnrealizedPnl').value) || 0;
+      const margin = Number(document.getElementById('posMargin').value) || 0;
+
+      const posData = { principal, symbol, amount, unrealizedPnl, margin, manualPrincipalOverride };
+      localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(posData));
+      render();
+    }
+
+    function loadSavedPosition() {
+      const posData = JSON.parse(localStorage.getItem(POSITION_STORAGE_KEY) || '{}');
+      if (posData.principal !== undefined && posData.principal !== null) {
+        document.getElementById('principalAmount').value = posData.principal;
+      }
+      if (posData.manualPrincipalOverride) {
+        manualPrincipalOverride = true;
+      }
+      
+      if (posData.symbol) {
+        const select = document.getElementById('posSymbol');
+        const customInput = document.getElementById('customPosSymbol');
+        const options = Array.from(select.options).map(o => o.value);
+        if (options.includes(posData.symbol)) {
+          select.value = posData.symbol;
+          customInput.classList.add('hidden');
+        } else {
+          select.value = '기타';
+          customInput.value = posData.symbol;
+          customInput.classList.remove('hidden');
+        }
+      }
+      if (posData.amount) document.getElementById('posAmount').value = posData.amount;
+      if (posData.unrealizedPnl !== undefined) document.getElementById('posUnrealizedPnl').value = posData.unrealizedPnl;
+      if (posData.margin) document.getElementById('posMargin').value = posData.margin;
+    }
+
+    function parseCSVLine(text) {
+      const result = [];
+      let cur = '';
+      let inQuotes = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (c === '"') { inQuotes = !inQuotes; } 
+        else if ((c === ',' || c === '\t') && !inQuotes) { result.push(cur.trim()); cur = ''; } 
+        else { cur += c; }
+      }
+      result.push(cur.trim());
+      return result;
+    }
+
+    function parseText(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const records = [];
+
+      lines.forEach((line) => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('日時') || trimmed.startsWith('﻿日時')) return;
+
+        let tokens = parseCSVLine(trimmed);
+        if (tokens.length < 5) tokens = trimmed.split(/[\t ]+/);
+        if (tokens.length < 5) return;
+
+        let rawDate = tokens[0].replace(/-/g, '/').slice(0, 10);
+        if (!/^\d{4}\/\d{1,2}\/\d{1,2}/.test(rawDate)) return;
+
+        const dateParts = rawDate.split('/');
+        const stdDate = `${dateParts[0]}/${dateParts[1].padStart(2, '0')}/${dateParts[2].padStart(2, '0')}`;
+
+        const type = tokens[1] || '';
+        const symbol = tokens[2] || '기타';
+        const direction = tokens[3] || '';
+        let amount = cleanNumber(tokens[4]);
+        let fee = cleanNumber(tokens[5]);
+        let balance = cleanNumber(tokens[6]);
+
+        if (direction.includes('支払') && amount > 0) amount = -amount;
+        if (type.includes('手数料') && amount > 0) amount = -amount;
+
+        records.push({ date: stdDate, type, symbol, direction, amount, fee: Math.abs(fee), balance });
+      });
+      return records;
+    }
+
+    function importTextData(text) {
+      const dict = i18n[currentLang] || i18n.ja;
+      const newRecords = parseText(text);
+      if (newRecords.length === 0) {
+        alert(dict.msgInvalidFormat);
+        return;
+      }
+      const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      const combined = [...existing, ...newRecords];
+      const unique = Array.from(new Map(combined.map(item => [JSON.stringify(item), item])).values());
+      unique.sort((a, b) => new Date(a.date) - new Date(b.date));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(unique));
+      alert(`${newRecords.length} ${dict.msgSuccessImport}`);
+      render();
+    }
+
+    function processData() {
+      const text = document.getElementById('rawInput').value;
+      if (!text.trim()) return;
+      importTextData(text);
+      document.getElementById('rawInput').value = '';
+      togglePastePopup();
+    }
+
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) { importTextData(evt.target.result); };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    function addManualDailyRecord(e) {
+      e.preventDefault();
+      const rawDate = document.getElementById('newRecDate').value;
+      if (!rawDate) return;
+      const stdDate = rawDate.replace(/-/g, '/');
+      const symbol = document.getElementById('newRecSymbol').value || 'USD/JPY';
+      const tradePnl = Number(document.getElementById('newRecTradePnl').value) || 0;
+      const fee = Number(document.getElementById('newRecFee').value) || 0;
+      const balance = Number(document.getElementById('newRecBalance').value) || 0;
+
+      const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      if (tradePnl !== 0) records.push({ date: stdDate, type: '取引所レバレッジ取引', symbol, direction: tradePnl >= 0 ? '受取' : '支払', amount: tradePnl, fee: 0, balance });
+      if (fee !== 0) records.push({ date: stdDate, type: '取引所レバレッジ手数料', symbol, direction: '支払', amount: -Math.abs(fee), fee: 0, balance });
+      if (tradePnl === 0 && fee === 0 && balance > 0) records.push({ date: stdDate, type: '残高記録', symbol, direction: '', amount: 0, fee: 0, balance });
+
+      records.sort((a, b) => new Date(a.date) - new Date(b.date));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+
+      document.getElementById('newRecTradePnl').value = '0';
+      document.getElementById('newRecFee').value = '0';
+      render();
+    }
+
+    function startEditDaily(dateStr) { editingDate = dateStr; render(); }
+    function cancelEditDaily() { editingDate = null; render(); }
+
+    function saveEditDaily(dateStr) {
+      const editSymbol = document.getElementById(`edit-symbol-${dateStr}`).value;
+      const editTradePnl = Number(document.getElementById(`edit-tradepnl-${dateStr}`).value) || 0;
+      const editFee = Number(document.getElementById(`edit-fee-${dateStr}`).value) || 0;
+      const editBalance = Number(document.getElementById(`edit-bal-${dateStr}`).value) || 0;
+
+      let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      records = records.filter(r => r.date !== dateStr);
+
+      if (editTradePnl !== 0) records.push({ date: dateStr, type: '取引所レバレッジ取引', symbol: editSymbol, direction: editTradePnl >= 0 ? '受取' : '支払', amount: editTradePnl, fee: 0, balance: editBalance });
+      if (editFee !== 0) records.push({ date: dateStr, type: '取引所レバレッジ手数料', symbol: editSymbol, direction: '支払', amount: -Math.abs(editFee), fee: 0, balance: editBalance });
+      if (editTradePnl === 0 && editFee === 0) records.push({ date: dateStr, type: '残高記録', symbol: editSymbol, direction: '', amount: 0, fee: 0, balance: editBalance });
+
+      records.sort((a, b) => new Date(a.date) - new Date(b.date));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      editingDate = null;
+      render();
+    }
+
+    function deleteDailyRecord(dateStr) {
+      const dict = i18n[currentLang] || i18n.ja;
+      if (confirm(`${dateStr} ${dict.msgDeleteConfirm}`)) {
+        let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        records = records.filter(r => r.date !== dateStr);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        render();
+      }
+    }
+
+    function render() {
+      const dict = i18n[currentLang] || i18n.ja;
+      const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      const posData = JSON.parse(localStorage.getItem(POSITION_STORAGE_KEY) || '{}');
+      const manualUnrealizedPnl = Number(posData.unrealizedPnl) || 0;
+
+      const filterEl = document.getElementById('dashboardAssetFilter');
+      const currentSelectedAsset = filterEl.value || 'ALL';
+      const allSymbols = new Set();
+      records.forEach(r => { if(r.symbol && r.symbol !== '기타') allSymbols.add(r.symbol); });
+      
+      filterEl.innerHTML = `<option value="ALL">${dict.filterAllAssets}</option>`;
+      allSymbols.forEach(sym => {
+        const opt = document.createElement('option');
+        opt.value = sym; opt.textContent = sym;
+        if(sym === currentSelectedAsset) opt.selected = true;
+        filterEl.appendChild(opt);
+      });
+      if (posData.symbol && posData.symbol !== '기타' && !allSymbols.has(posData.symbol)) {
+        const opt = document.createElement('option');
+        opt.value = posData.symbol; opt.textContent = posData.symbol;
+        if(posData.symbol === currentSelectedAsset) opt.selected = true;
+        filterEl.appendChild(opt);
+      }
+
+      const activeFilter = filterEl.value;
+
+      const dailyMap = {};
+      const symbolMap = {};
+      let totalTradePnl = 0;
+      let totalFee = 0;
+      let latestBal = 0;
+
+      records.forEach(r => {
+        const d = r.date;
+        if (!dailyMap[d]) {
+          dailyMap[d] = { date: d, tradePnl: 0, fees: 0, netPnl: 0, balance: 0, symbols: new Set() };
+        }
+        if (r.balance > 0) dailyMap[d].balance = r.balance;
+
+        if (activeFilter === 'ALL' || r.symbol === activeFilter) {
+          if (r.type.includes('手数料')) {
+            dailyMap[d].fees += Math.abs(r.amount);
+            totalFee += Math.abs(r.amount);
+          } else {
+            dailyMap[d].tradePnl += r.amount;
+            totalTradePnl += r.amount;
+            if (r.symbol && r.symbol !== '기타') {
+              symbolMap[r.symbol] = (symbolMap[r.symbol] || 0) + r.amount;
+            }
+          }
+          if (r.symbol) dailyMap[d].symbols.add(r.symbol);
+        }
+      });
+
+      const dailyList = Object.values(dailyMap).sort((a, b) => new Date(a.date) - new Date(b.date));
+      dailyList.forEach(d => {
+        d.netPnl = d.tradePnl - d.fees;
+        if (d.balance > 0) latestBal = d.balance;
+      });
+
+      const isActivePosMatch = (activeFilter === 'ALL' || activeFilter === posData.symbol);
+      const activeUnrealizedPnl = isActivePosMatch ? manualUnrealizedPnl : 0;
+
+      const netRealizedPnl = totalTradePnl - totalFee;
+      const totalProfitWithUnrealized = netRealizedPnl + activeUnrealizedPnl;
+      const totalNetWorth = latestBal + activeUnrealizedPnl;
+
+      let calculatedPrincipal = totalNetWorth - totalProfitWithUnrealized;
+      if (calculatedPrincipal < 0) calculatedPrincipal = 0;
+
+      let finalPrincipal = calculatedPrincipal;
+      if (posData.principal !== null && posData.principal !== undefined && posData.manualPrincipalOverride) {
+        finalPrincipal = Number(posData.principal);
+      } else {
+        const pInput = document.getElementById('principalAmount');
+        if (pInput && !manualPrincipalOverride) {
+          pInput.placeholder = `Auto: ¥${Math.round(calculatedPrincipal).toLocaleString()}`;
+        }
+      }
+
+      document.getElementById('kpiTotalNetWorth').textContent = `¥${Math.round(totalNetWorth).toLocaleString()}`;
+      document.getElementById('kpiPrincipal').textContent = `¥${Math.round(finalPrincipal).toLocaleString()}`;
+
+      document.getElementById('kpiTotalProfit').textContent = formatYen(totalProfitWithUnrealized);
+      document.getElementById('kpiTotalProfit').className = `text-xl lg:text-2xl font-black font-mono tracking-tight ${totalProfitWithUnrealized >= 0 ? 'text-rose-600' : 'text-sky-700'}`;
+
+      document.getElementById('kpiTotalFee').textContent = `-¥${Math.round(totalFee).toLocaleString()}`;
+
+      document.getElementById('kpiUnrealizedPnl').textContent = formatYen(activeUnrealizedPnl);
+      document.getElementById('kpiUnrealizedSub').textContent = isActivePosMatch ? `${posData.symbol || 'USD/JPY'} (${posData.amount || 0})` : '-';
+
+      document.getElementById('kpiLatestBalance').textContent = `¥${Math.round(latestBal).toLocaleString()}`;
+
+      if (finalPrincipal > 0) {
+        const roiPercent = ((totalProfitWithUnrealized / finalPrincipal) * 100).toFixed(2);
+        const roiSign = roiPercent >= 0 ? '+' : '';
+        document.getElementById('kpiRoi').textContent = `${roiSign}${roiPercent}%`;
+        document.getElementById('kpiRoi').className = `text-xl lg:text-2xl font-black font-mono tracking-tight ${roiPercent >= 0 ? 'text-rose-500' : 'text-sky-600'}`;
+      } else {
+        document.getElementById('kpiRoi').textContent = `-%`;
+        document.getElementById('kpiRoi').className = `text-xl lg:text-2xl font-black font-mono text-slate-400`;
+      }
+
+      renderTables(dailyList, latestBal);
+      renderRecentTransactions(dailyList);
+      renderCharts(dailyList, symbolMap);
+    }
+
+    function renderRecentTransactions(dailyList) {
+      const dict = i18n[currentLang] || i18n.ja;
+      const recentBody = document.getElementById('recentDailyTableBody');
+      recentBody.innerHTML = '';
+
+      if (dailyList.length === 0) {
+        recentBody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-semibold">${dict.noDataText}</td></tr>`;
+        return;
+      }
+
+      const recentFive = dailyList.slice().reverse().slice(0, 5);
+
+      recentFive.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/80 transition';
+        tr.innerHTML = `
+          <td class="p-3 font-mono font-bold text-slate-700">${d.date}</td>
+          <td class="p-3 font-semibold text-slate-500">${Array.from(d.symbols).join(', ') || '-'}</td>
+          <td class="p-3 text-right font-mono font-semibold ${d.tradePnl >= 0 ? 'text-rose-500' : 'text-sky-600'}">${formatYen(d.tradePnl)}</td>
+          <td class="p-3 text-right font-mono text-amber-600 font-semibold">-¥${Math.round(d.fees).toLocaleString()}</td>
+          <td class="p-3 text-right font-mono font-bold ${d.netPnl >= 0 ? 'text-rose-500' : 'text-sky-600'}">${formatYen(d.netPnl)}</td>
+          <td class="p-3 text-right font-mono font-bold text-teal-600">¥${Math.round(d.balance).toLocaleString()}</td>
+        `;
+        recentBody.appendChild(tr);
+      });
+    }
+
+    // ⭐ 월별 집계표 및 월별 합계 카드/행 렌더링
+    function renderTables(dailyList, currentBal) {
+      const dict = i18n[currentLang] || i18n.ja;
+      
+      const monthlyMap = {};
+      let grandTotalTradePnl = 0;
+      let grandTotalFee = 0;
+      let grandTotalNetPnl = 0;
+
+      dailyList.forEach(d => {
+        const m = d.date.slice(0, 7);
+        if (!monthlyMap[m]) {
+          monthlyMap[m] = { month: m, tradePnl: 0, fees: 0, netPnl: 0, endBalance: d.balance, startBalance: d.balance };
+        }
+        monthlyMap[m].tradePnl += d.tradePnl;
+        monthlyMap[m].fees += d.fees;
+        monthlyMap[m].netPnl += d.netPnl;
+        monthlyMap[m].endBalance = d.balance;
+
+        grandTotalTradePnl += d.tradePnl;
+        grandTotalFee += d.fees;
+        grandTotalNetPnl += d.netPnl;
+      });
+
+      // 1. 월별 집계 상단 4대 합계 카드 갱신
+      document.getElementById('monthlyTotalTradePnl').textContent = formatYen(grandTotalTradePnl);
+      document.getElementById('monthlyTotalTradePnl').className = `text-xl lg:text-2xl font-black font-mono tracking-tight ${grandTotalTradePnl >= 0 ? 'text-rose-600' : 'text-sky-700'}`;
+
+      document.getElementById('monthlyTotalFee').textContent = `-¥${Math.round(grandTotalFee).toLocaleString()}`;
+
+      document.getElementById('monthlyTotalNetPnl').textContent = formatYen(grandTotalNetPnl);
+      document.getElementById('monthlyTotalNetPnl').className = `text-xl lg:text-2xl font-black font-mono tracking-tight ${grandTotalNetPnl >= 0 ? 'text-teal-900' : 'text-sky-900'}`;
+
+      document.getElementById('monthlyCurrentBalance').textContent = `¥${Math.round(currentBal).toLocaleString()}`;
+
+      const monthlyList = Object.values(monthlyMap).sort((a, b) => new Date(a.month) - new Date(b.month));
+      const mBody = document.getElementById('monthlyTableBody');
+      const mFoot = document.getElementById('monthlyTableFoot');
+      mBody.innerHTML = '';
+      mFoot.innerHTML = '';
+
+      if (monthlyList.length === 0) {
+        mBody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-semibold">${dict.noDataText}</td></tr>`;
+      } else {
+        // 개별 월 렌더링
+        monthlyList.slice().reverse().forEach(m => {
+          const roi = m.startBalance > 0 ? ((m.netPnl / m.startBalance) * 100).toFixed(1) : '-';
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/80 transition';
+          tr.innerHTML = `
+            <td class="p-3.5 font-mono font-bold text-slate-700">${m.month}</td>
+            <td class="p-3.5 text-right font-mono font-semibold ${m.tradePnl >= 0 ? 'text-rose-500' : 'text-sky-600'}">${formatYen(m.tradePnl)}</td>
+            <td class="p-3.5 text-right font-mono text-amber-600 font-semibold">-¥${Math.round(m.fees).toLocaleString()}</td>
+            <td class="p-3.5 text-right font-mono font-bold ${m.netPnl >= 0 ? 'text-rose-500' : 'text-sky-600'}">${formatYen(m.netPnl)}</td>
+            <td class="p-3.5 text-right font-mono font-bold text-teal-600">¥${Math.round(m.endBalance).toLocaleString()}</td>
+            <td class="p-3.5 text-right font-mono font-extrabold ${roi >= 0 ? 'text-rose-500' : 'text-sky-600'}">${roi !== '-' ? (roi >= 0 ? '+' + roi : roi) + '%' : '-'}</td>
+          `;
+          mBody.appendChild(tr);
+        });
+
+        // 2. 테이블 최하단 총합계(総合計) 행 렌더링
+        const initialBalance = monthlyList[0].startBalance;
+        const totalRoi = initialBalance > 0 ? ((grandTotalNetPnl / initialBalance) * 100).toFixed(1) : '-';
+
+        const footTr = document.createElement('tr');
+        footTr.className = 'bg-slate-100/80 text-slate-800 text-sm font-black border-t-2 border-slate-300';
+        footTr.innerHTML = `
+          <td class="p-3.5 font-bold text-slate-800">${dict.thTotalRow}</td>
+          <td class="p-3.5 text-right font-mono font-black ${grandTotalTradePnl >= 0 ? 'text-rose-600' : 'text-sky-700'}">${formatYen(grandTotalTradePnl)}</td>
+          <td class="p-3.5 text-right font-mono text-amber-700 font-black">-¥${Math.round(grandTotalFee).toLocaleString()}</td>
+          <td class="p-3.5 text-right font-mono font-black ${grandTotalNetPnl >= 0 ? 'text-rose-600' : 'text-sky-700'}">${formatYen(grandTotalNetPnl)}</td>
+          <td class="p-3.5 text-right font-mono text-teal-700 font-black">¥${Math.round(currentBal).toLocaleString()}</td>
+          <td class="p-3.5 text-right font-mono font-black ${totalRoi >= 0 ? 'text-rose-600' : 'text-sky-700'}">${totalRoi !== '-' ? (totalRoi >= 0 ? '+' + totalRoi : totalRoi) + '%' : '-'}</td>
+        `;
+        mFoot.appendChild(footTr);
+      }
+
+      // 일별 테이블 렌더링
+      const dBody = document.getElementById('dailyTableBody');
+      dBody.innerHTML = '';
+      if (dailyList.length === 0) {
+        dBody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-semibold">${dict.noDataText}</td></tr>`;
+      } else {
+        dailyList.slice().reverse().forEach(d => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/80 transition';
+
+          if (editingDate === d.date) {
+            const symbolsStr = Array.from(d.symbols).join(', ') || 'USD/JPY';
+            tr.className = 'bg-sky-50/70 border border-sky-200';
+            tr.innerHTML = `
+              <td class="p-2 font-mono font-bold text-sky-600">${d.date}</td>
+              <td class="p-2"><input type="text" id="edit-symbol-${d.date}" value="${symbolsStr}" class="w-24 clay-input px-2 py-1 text-xs"></td>
+              <td class="p-2 text-right"><input type="number" id="edit-tradepnl-${d.date}" value="${d.tradePnl}" class="w-28 text-right clay-input px-2 py-1 text-xs font-mono"></td>
+              <td class="p-2 text-right"><input type="number" id="edit-fee-${d.date}" value="${d.fees}" class="w-24 text-right clay-input px-2 py-1 text-xs font-mono"></td>
+              <td class="p-2 text-right font-semibold text-slate-400 font-mono">-</td>
+              <td class="p-2 text-right"><input type="number" id="edit-bal-${d.date}" value="${d.balance}" class="w-28 text-right clay-input px-2 py-1 text-xs font-mono"></td>
+              <td class="p-2 text-center space-x-1">
+                <button onclick="saveEditDaily('${d.date}')" class="clay-button text-white font-bold px-2.5 py-1 text-xs">${dict.btnSave}</button>
+                <button onclick="cancelEditDaily()" class="bg-slate-200 text-slate-600 font-bold px-2 py-1 rounded-xl text-xs">${dict.btnCancel}</button>
+              </td>
+            `;
+          } else {
+            tr.innerHTML = `
+              <td class="p-3.5 font-mono font-bold text-slate-700">${d.date}</td>
+              <td class="p-3.5 font-semibold text-slate-500">${Array.from(d.symbols).join(', ') || '-'}</td>
+              <td class="p-3.5 text-right font-mono font-semibold ${d.tradePnl >= 0 ? 'text-rose-500' : 'text-sky-600'}">${formatYen(d.tradePnl)}</td>
+              <td class="p-3.5 text-right font-mono text-amber-600 font-semibold">-¥${Math.round(d.fees).toLocaleString()}</td>
+              <td class="p-3.5 text-right font-mono font-bold ${d.netPnl >= 0 ? 'text-rose-500' : 'text-sky-600'}">${formatYen(d.netPnl)}</td>
+              <td class="p-3.5 text-right font-mono font-bold text-teal-600">¥${Math.round(d.balance).toLocaleString()}</td>
+              <td class="p-3.5 text-center space-x-2 font-bold">
+                <button onclick="startEditDaily('${d.date}')" class="text-sky-500 hover:text-sky-600 underline">${dict.btnEdit}</button>
+                <button onclick="deleteDailyRecord('${d.date}')" class="text-rose-400 hover:text-rose-500 underline">${dict.btnDelete}</button>
+              </td>
+            `;
+          }
+          dBody.appendChild(tr);
+        });
+      }
+    }
+
+    function renderCharts(dailyList, symbolMap) {
+      const dict = i18n[currentLang] || i18n.ja;
+      const breakdownEl = document.getElementById('symbolBreakdown');
+      breakdownEl.innerHTML = '';
+      Object.entries(symbolMap).forEach(([sym, val]) => {
+        const div = document.createElement('div');
+        div.className = 'flex justify-between items-center text-slate-600';
+        div.innerHTML = `<span class="font-bold">${sym}</span><span class="font-mono font-bold ${val >= 0 ? 'text-rose-500' : 'text-sky-600'}">${formatYen(val)}</span>`;
+        breakdownEl.appendChild(div);
+      });
+
+      const ctx1 = document.getElementById('mainChart').getContext('2d');
+      let cumNetPnl = 0;
+      const labels = dailyList.map(d => d.date.slice(5));
+      const cumPnlData = dailyList.map(d => { cumNetPnl += d.netPnl; return cumNetPnl; });
+      const balanceData = dailyList.map(d => d.balance);
+
+      if (lineChart) lineChart.destroy();
+      lineChart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: dict.chartLabelNetPnl,
+              data: cumPnlData,
+              borderColor: '#FB7185',
+              backgroundColor: 'rgba(251, 113, 133, 0.12)',
+              borderWidth: 3, pointRadius: 3, pointBackgroundColor: '#FB7185',
+              yAxisID: 'y', tension: 0.35, fill: true
+            },
+            {
+              label: dict.chartLabelBalance,
+              data: balanceData,
+              borderColor: '#2DD4BF',
+              backgroundColor: 'transparent',
+              borderWidth: 2.5, borderDash: [5, 5], pointRadius: 2,
+              yAxisID: 'y1', tension: 0.35
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: { legend: { labels: { color: '#64748B', font: { family: 'Plus Jakarta Sans', size: 12, weight: 'bold' } } } },
+          scales: {
+            x: { grid: { color: '#F1F5F9' }, ticks: { color: '#94A3B8', font: { size: 11, weight: 'bold' } } },
+            y: { position: 'left', grid: { color: '#F1F5F9' }, ticks: { color: '#FB7185', font: { size: 11, weight: 'bold' } } },
+            y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#2DD4BF', font: { size: 11, weight: 'bold' } } }
+          }
+        }
+      });
+
+      const ctx2 = document.getElementById('symbolChart').getContext('2d');
+      const symLabels = Object.keys(symbolMap);
+      const symData = Object.values(symbolMap).map(v => Math.max(0, v));
+
+      if (donutChart) donutChart.destroy();
+      donutChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: symLabels,
+          datasets: [{
+            data: symData.length ? symData : [1],
+            backgroundColor: symData.length ? ['#2DD4BF', '#38BDF8', '#A855F7', '#FB7185'] : ['#E2E8F0'],
+            borderWidth: 4, borderColor: '#FFFFFF'
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: symData.length > 0 } },
+          cutout: '72%'
+        }
+      });
+    }
+
+    function exportBackupJSON() {
+      const backupData = {
+        version: '7.0', exportedAt: new Date().toISOString(),
+        position: JSON.parse(localStorage.getItem(POSITION_STORAGE_KEY) || '{}'),
+        records: JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+      };
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `Leverage_Asset_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click(); URL.revokeObjectURL(url);
+    }
+    
+    function importBackupJSON(e) {
+      const dict = i18n[currentLang] || i18n.ja;
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const data = JSON.parse(evt.target.result);
+          if (data.records && Array.isArray(data.records)) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data.records));
+            if (data.position) localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(data.position));
+            loadSavedPosition();
+            alert(dict.msgSuccessBackup);
+            render(); navigate('dashboard');
+          }
+        } catch (err) { alert('File Error: ' + err.message); }
+      };
+      reader.readAsText(file, 'utf-8'); e.target.value = '';
+    }
+
+    function exportCSV() {
+      const dict = i18n[currentLang] || i18n.ja;
+      const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      if (records.length === 0) return alert(dict.noDataText);
+      let csvContent = '\uFEFF日時,精算区分,銘柄名,受取/支払,金額,手数料,残高\n';
+      records.forEach(r => {
+        csvContent += `"${r.date}","${r.type}","${r.symbol}","${r.amount >= 0 ? '受取' : '支払'}","${r.amount} 円","${r.fee} 円","${r.balance} 円"\n`;
+      });
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `Leverage_Asset_Records_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click(); URL.revokeObjectURL(url);
+    }
+
+    function clearAllData() {
+      const dict = i18n[currentLang] || i18n.ja;
+      if (confirm(dict.msgResetConfirm)) {
+        localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(POSITION_STORAGE_KEY);
+        manualPrincipalOverride = false;
+        document.getElementById('principalAmount').value = ''; 
+        document.getElementById('posAmount').value = '';
+        document.getElementById('posUnrealizedPnl').value = ''; 
+        document.getElementById('posMargin').value = '';
+        render();
+      }
+    }
+
+    function initTodayDate() {
+      const now = new Date();
+      const dateEl = document.getElementById('newRecDate');
+      if (dateEl) dateEl.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    }
+
+    setLanguage(currentLang);
+    loadSavedPosition();
+    initTodayDate();
+    render();
+  </script>
+</body>
+</html>
