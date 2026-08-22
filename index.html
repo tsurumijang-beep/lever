@@ -46,6 +46,11 @@
       box-shadow: 8px 12px 24px rgba(245, 158, 11, 0.12), -4px -4px 12px #FFFFFF, inset 2px 2px 4px rgba(255, 255, 255, 0.8);
       border: 1px solid rgba(253, 230, 138, 0.6);
     }
+    .clay-card-emerald {
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+      box-shadow: 8px 12px 24px rgba(168, 185, 129, 0.12), -4px -4px 12px #FFFFFF, inset 2px 2px 4px rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(167, 243, 208, 0.6);
+    }
     .clay-button {
       background: linear-gradient(135deg, #38BDF8 0%, #0EA5E9 100%);
       box-shadow: 0 6px 14px rgba(14, 165, 233, 0.28), inset 0 2px 2px rgba(255, 255, 255, 0.4);
@@ -139,62 +144,77 @@
   <!-- ================= 메인 콘텐츠 영역 ================= -->
   <main class="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto w-full max-w-[2200px]">
     
-    <!-- Top Bar -->
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-slate-200/80 gap-4">
-      <div class="flex items-center gap-4">
+    <!-- Top Bar & 상단 2대 메인 KPI 지표 -->
+    <header class="flex flex-col xl:flex-row justify-between items-start xl:items-center pb-5 border-b border-slate-200/80 gap-5">
+      <div class="flex flex-wrap items-center gap-4">
         <h2 id="viewTitle" class="text-xl md:text-2xl font-extrabold text-slate-800 flex items-center gap-2">
           <span>📊</span> <span data-i18n="viewTitleDashboard">総合ダッシュボード</span>
         </h2>
-        <select id="dashboardAssetFilter" onchange="render()" class="clay-input px-3 py-1.5 text-sm font-bold text-slate-700 hidden sm:block">
+        <select id="dashboardAssetFilter" onchange="render()" class="clay-input px-3.5 py-2 text-sm font-bold text-slate-700 hidden sm:block">
           <option value="ALL" data-i18n="filterAllAssets">全資産総合</option>
         </select>
       </div>
 
-      <!-- 다국어 툴바 -->
-      <div class="flex flex-wrap items-center gap-2.5 relative">
-        <div class="flex bg-white rounded-2xl border border-slate-200 p-0.5 shadow-sm">
-          <button id="lang-ja" onclick="setLanguage('ja')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">JP</button>
-          <button id="lang-en" onclick="setLanguage('en')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">EN</button>
-          <button id="lang-ko" onclick="setLanguage('ko')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">KO</button>
-          <button id="lang-zh" onclick="setLanguage('zh')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">ZH</button>
-          <button id="lang-es" onclick="setLanguage('es')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">ES</button>
+      <!-- 상단 메인 2대 KPI 카드 및 글로벌 툴바 -->
+      <div class="flex flex-wrap items-center gap-3.5 w-full xl:w-auto">
+        <!-- 1. 실질 총자산 -->
+        <div class="clay-card-mint px-5 py-3 rounded-2xl flex items-center gap-3.5 shadow-md flex-1 sm:flex-initial min-w-[200px]">
+          <div class="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center text-2xl">💎</div>
+          <div>
+            <div class="text-[11px] font-bold text-teal-800" data-i18n="kpiNetWorthTitle">実質総資産</div>
+            <div id="kpiTotalNetWorth" class="text-xl lg:text-2xl font-black font-mono text-teal-900 tracking-tight leading-tight">¥0</div>
+          </div>
         </div>
 
-        <label class="cursor-pointer clay-button text-white font-bold text-xs px-3.5 py-2 flex items-center gap-1.5 shadow-md">
-          <span>📂</span> <span data-i18n="btnCsvUpload">CSV 添付</span>
-          <input type="file" id="csvFileInput" accept=".csv, .txt" class="hidden" onchange="handleFileUpload(event)">
-        </label>
-        
-        <button onclick="togglePastePopup()" class="bg-white hover:bg-slate-50 text-slate-600 font-bold border border-slate-200 text-xs px-3.5 py-2 rounded-2xl shadow-sm transition flex items-center gap-1.5">
-          <span>📝</span> <span data-i18n="btnPasteText">テキスト貼付</span>
-        </button>
-
-        <div id="pastePopup" class="hidden absolute right-0 top-12 w-80 bg-white rounded-3xl p-4 shadow-2xl border border-slate-100 z-50">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-extrabold text-slate-700" data-i18n="popupPasteTitle">取引履歴データの入力</span>
-            <button onclick="togglePastePopup()" class="text-xs text-slate-400 hover:text-slate-600">✕</button>
+        <!-- 2. 원금 대비 수익률 -->
+        <div class="clay-card px-5 py-3 rounded-2xl flex items-center gap-3.5 shadow-md flex-1 sm:flex-initial min-w-[180px]">
+          <div class="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-2xl">🎯</div>
+          <div>
+            <div class="text-[11px] font-bold text-slate-500" data-i18n="kpiRoiTitle">元本対比収益率</div>
+            <div id="kpiRoi" class="text-xl lg:text-2xl font-black font-mono text-slate-800 tracking-tight leading-tight">-%</div>
           </div>
-          <textarea id="rawInput" rows="4" placeholder="日時  精算区分  銘柄名  受取/支払  金額  手数料  残高" class="w-full clay-input p-2.5 text-[11px] font-mono text-slate-600 mb-2"></textarea>
-          <button onclick="processData()" class="w-full clay-button text-white font-bold text-xs py-2" data-i18n="popupBtnAnalyze">
-            分析および反映
+        </div>
+
+        <!-- 다국어 툴바, 파일/텍스트 첨부, 데이터 초기화 버튼 -->
+        <div class="flex flex-wrap items-center gap-2 relative ml-auto">
+          <div class="flex bg-white rounded-2xl border border-slate-200 p-0.5 shadow-sm">
+            <button id="lang-ja" onclick="setLanguage('ja')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">JP</button>
+            <button id="lang-en" onclick="setLanguage('en')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">EN</button>
+            <button id="lang-ko" onclick="setLanguage('ko')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">KO</button>
+            <button id="lang-zh" onclick="setLanguage('zh')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">ZH</button>
+            <button id="lang-es" onclick="setLanguage('es')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">ES</button>
+          </div>
+
+          <label class="cursor-pointer clay-button text-white font-bold text-xs px-3.5 py-2 flex items-center gap-1.5 shadow-md">
+            <span>📂</span> <span data-i18n="btnCsvUpload">CSV 添付</span>
+            <input type="file" id="csvFileInput" accept=".csv, .txt" class="hidden" onchange="handleFileUpload(event)">
+          </label>
+          
+          <button onclick="togglePastePopup()" class="bg-white hover:bg-slate-50 text-slate-600 font-bold border border-slate-200 text-xs px-3.5 py-2 rounded-2xl shadow-sm transition flex items-center gap-1.5">
+            <span>📝</span> <span data-i18n="btnPasteText">テキスト貼付</span>
           </button>
+
+          <button onclick="clearAllData()" class="bg-rose-50 hover:bg-rose-100 text-rose-500 font-bold border border-rose-200 text-xs px-3.5 py-2 rounded-2xl shadow-sm transition flex items-center gap-1.5">
+            <span>🗑️</span> <span data-i18n="btnResetAll">すべてのデータを初期化</span>
+          </button>
+
+          <div id="pastePopup" class="hidden absolute right-0 top-12 w-80 bg-white rounded-3xl p-4 shadow-2xl border border-slate-100 z-50">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-extrabold text-slate-700" data-i18n="popupPasteTitle">取引履歴データの入力</span>
+              <button onclick="togglePastePopup()" class="text-xs text-slate-400 hover:text-slate-600">✕</button>
+            </div>
+            <textarea id="rawInput" rows="4" placeholder="日時  精算区分  銘柄名  受取/支払  金額  手数料  残高" class="w-full clay-input p-2.5 text-[11px] font-mono text-slate-600 mb-2"></textarea>
+            <button onclick="processData()" class="w-full clay-button text-white font-bold text-xs py-2" data-i18n="popupBtnAnalyze">
+              分析および反映
+            </button>
+          </div>
         </div>
       </div>
     </header>
 
-    <!-- [KPI 핵심 지표 그리드] -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
-      <div class="clay-card-mint p-4 rounded-3xl flex flex-col justify-between relative overflow-hidden">
-        <div class="flex justify-between items-start">
-          <span class="text-xs font-bold text-teal-800" data-i18n="kpiNetWorthTitle">実質総資産</span>
-          <span class="text-base">💎</span>
-        </div>
-        <div class="my-2">
-          <div id="kpiTotalNetWorth" class="text-xl lg:text-2xl font-black font-mono text-teal-900 tracking-tight">¥0</div>
-        </div>
-        <div id="kpiNetWorthSub" class="text-[10px] font-semibold text-teal-700/80 truncate" data-i18n="kpiNetWorthSub">残高+含み損益合算</div>
-      </div>
-
+    <!-- [하단 6대 보조 KPI 지표 그리드] -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <!-- 1. 초기 투자 원본 -->
       <div class="clay-card p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-slate-500" data-i18n="kpiPrincipalTitle">初期投資元本</span>
@@ -206,6 +226,7 @@
         <div class="text-[10px] font-semibold text-slate-400 truncate" data-i18n="kpiPrincipalSub">総資産 - 総損益 (自動算出)</div>
       </div>
 
+      <!-- 2. 누적 총손익 -->
       <div class="clay-card-peach p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-rose-800" data-i18n="kpiTotalProfitTitle">累積総損益</span>
@@ -217,6 +238,19 @@
         <div id="kpiTotalProfitSub" class="text-[10px] font-semibold text-rose-700/80 truncate" data-i18n="kpiTotalProfitSub">確定損益 + 含み損益</div>
       </div>
 
+      <!-- 3. 확정 순수익 -->
+      <div class="clay-card-emerald p-4 rounded-3xl flex flex-col justify-between">
+        <div class="flex justify-between items-start">
+          <span class="text-xs font-bold text-emerald-800" data-i18n="kpiRealizedPnlTitle">確定純損益</span>
+          <span class="text-base">💰</span>
+        </div>
+        <div class="my-2">
+          <div id="kpiRealizedPnl" class="text-xl lg:text-2xl font-black font-mono text-emerald-700 tracking-tight">¥0</div>
+        </div>
+        <div id="kpiRealizedPnlSub" class="text-[10px] font-semibold text-emerald-700/80 truncate" data-i18n="kpiRealizedPnlSub">決済損益 - 手数料</div>
+      </div>
+
+      <!-- 4. 누적 관리 수수료 -->
       <div class="clay-card-amber p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-amber-800" data-i18n="kpiTotalFeeTitle">累積管理手数料</span>
@@ -228,6 +262,7 @@
         <div class="text-[10px] font-semibold text-amber-700/80 truncate" data-i18n="kpiTotalFeeSub">06:00 ロールオーバー費</div>
       </div>
 
+      <!-- 5. 미실현 손익 -->
       <div class="clay-card-lavender p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-purple-800" data-i18n="kpiUnrealizedTitle">未実現損益 (含み益)</span>
@@ -239,6 +274,7 @@
         <div id="kpiUnrealizedSub" class="text-[10px] font-semibold text-purple-600/80 truncate" data-i18n="kpiUnrealizedSub">保有ポジション評価額</div>
       </div>
 
+      <!-- 6. 확정 일본엔 잔고 -->
       <div class="clay-card-sky p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-sky-800" data-i18n="kpiBalanceTitle">確定日本円残高</span>
@@ -248,17 +284,6 @@
           <div id="kpiLatestBalance" class="text-xl lg:text-2xl font-black font-mono text-sky-900 tracking-tight">¥0</div>
         </div>
         <div id="kpiDateRange" class="text-[10px] font-semibold text-sky-700/80 truncate" data-i18n="kpiBalanceSub">最新精算データ基準</div>
-      </div>
-
-      <div class="clay-card p-4 rounded-3xl flex flex-col justify-between">
-        <div class="flex justify-between items-start">
-          <span class="text-xs font-bold text-slate-500" data-i18n="kpiRoiTitle">元本対比収益率</span>
-          <span class="text-base">🎯</span>
-        </div>
-        <div class="my-2">
-          <div id="kpiRoi" class="text-xl lg:text-2xl font-black font-mono text-slate-800 tracking-tight">-%</div>
-        </div>
-        <div id="kpiRoiSub" class="text-[10px] font-semibold text-slate-400 truncate" data-i18n="kpiRoiSub">総損益 ÷ 初期元本</div>
       </div>
     </div>
 
@@ -449,6 +474,16 @@
     <!-- ================= VIEW 4: 일별 상세 내역 뷰 ================= -->
     <section id="view-daily" class="hidden space-y-6">
       <div class="clay-card p-6 space-y-6">
+        
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-100">
+          <div class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+            <span>📆</span> <span data-i18n="viewTitleDaily">日別詳細取引履歴</span>
+          </div>
+          <button onclick="clearAllData()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-500 bg-rose-50 hover:bg-rose-100 border border-rose-200 shadow-sm transition flex items-center gap-1.5">
+            <span>🗑️</span> <span data-i18n="btnResetAll">すべてのデータを初期化</span>
+          </button>
+        </div>
+
         <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-3">
           <div class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
             <span>➕</span> <span data-i18n="dailyAddTitle">日別詳細データの直接追加</span>
@@ -543,7 +578,7 @@
   </main>
 
   <script>
-    const STORAGE_KEY = 'gmo_leverage_parsed_records_v9';
+    const STORAGE_KEY = 'gmo_leverage_parsed_records_v10';
     const POSITION_STORAGE_KEY = 'gmo_leverage_manual_position_v6';
     const LANG_STORAGE_KEY = 'gmo_leverage_lang_v4';
 
@@ -581,6 +616,8 @@
         kpiPrincipalSub: '総資産 - 総損益 (自動算出)',
         kpiTotalProfitTitle: '累積総損益',
         kpiTotalProfitSub: '確定損益 + 含み損益',
+        kpiRealizedPnlTitle: '確定純損益',
+        kpiRealizedPnlSub: '決済損益 - 手数料',
         kpiTotalFeeTitle: '累積管理手数料',
         kpiTotalFeeSub: '06:00 ロールオーバー費',
         kpiUnrealizedTitle: '未実現損益 (含み益)',
@@ -674,6 +711,8 @@
         kpiPrincipalSub: 'Net Worth - Total Profit (Auto)',
         kpiTotalProfitTitle: 'Cumulative Net Profit',
         kpiTotalProfitSub: 'Realized + Unrealized PnL',
+        kpiRealizedPnlTitle: 'Realized Net Profit',
+        kpiRealizedPnlSub: 'Settled PnL - Fees',
         kpiTotalFeeTitle: 'Cumulative Fees',
         kpiTotalFeeSub: '06:00 Rollover Fee Total',
         kpiUnrealizedTitle: 'Unrealized PnL',
@@ -767,6 +806,8 @@
         kpiPrincipalSub: '총자산 - 총손익 (자동 역산)',
         kpiTotalProfitTitle: '누적 총수익',
         kpiTotalProfitSub: '확정 손익 + 미실현 손익',
+        kpiRealizedPnlTitle: '확정 순수익',
+        kpiRealizedPnlSub: '결제손익 - 수수료',
         kpiTotalFeeTitle: '누적 관리수수료',
         kpiTotalFeeSub: '06:00 롤오버 피 합산',
         kpiUnrealizedTitle: '미실현 수익 (평가손익)',
@@ -860,6 +901,8 @@
         kpiPrincipalSub: '总资产 - 总盈亏 (自动计算)',
         kpiTotalProfitTitle: '累计总盈亏',
         kpiTotalProfitSub: '已实现盈亏 + 浮动盈亏',
+        kpiRealizedPnlTitle: '已实现净盈亏',
+        kpiRealizedPnlSub: '结算盈亏 - 手续费',
         kpiTotalFeeTitle: '累计管理费',
         kpiTotalFeeSub: '06:00 隔夜费汇总',
         kpiUnrealizedTitle: '未实现盈亏 (浮动盈亏)',
@@ -953,6 +996,8 @@
         kpiPrincipalSub: 'Patrimonio - Ganancia Total (Auto)',
         kpiTotalProfitTitle: 'Ganancia Neta Acumulada',
         kpiTotalProfitSub: 'Realizada + No Realizada',
+        kpiRealizedPnlTitle: 'Ganancia Neta Realizada',
+        kpiRealizedPnlSub: 'Ganancia Liquidada - Tarifas',
         kpiTotalFeeTitle: 'Comisiones Acumuladas',
         kpiTotalFeeSub: 'Tarifa Rollover 06:00 Total',
         kpiUnrealizedTitle: 'Ganancia No Realizada',
@@ -1169,7 +1214,7 @@
       return result;
     }
 
-    // 精算区分(2번째 열)을 제외하고 맨 끝 3개 컬럼(금액, 수수료, 잔고)을 기준으로 파싱
+    // 精算区分 기반 [결제손익 vs 관리수수료] 분기 처리
     function parseText(text) {
       const lines = text.trim().split(/\r?\n/);
       const records = [];
@@ -1188,40 +1233,54 @@
         const dateParts = rawDate.split('/');
         const stdDate = `${dateParts[0]}/${dateParts[1].padStart(2, '0')}/${dateParts[2].padStart(2, '0')}`;
 
-        // 맨 마지막 열이 잔고(残高), 그 앞이 수수료(手数料), 그 앞이 금액(金額)
-        const balance = cleanNumber(tokens[tokens.length - 1]);
-        const fee = cleanNumber(tokens[tokens.length - 2]);
-        let amount = cleanNumber(tokens[tokens.length - 3]);
+        const type = tokens[1] || ''; // 精算区分
+        const symbol = tokens[2] || 'LINK/JPY';
+        const direction = tokens[3] || '';
+        const rawAmount = cleanNumber(tokens[4]);
+        const fee = cleanNumber(tokens[5]);
+        const balance = cleanNumber(tokens[6]);
 
-        let direction = '';
-        let symbol = 'LINK/JPY';
+        let tradePnl = 0;
+        let managementFee = 0;
 
-        if (tokens.length >= 7) {
-          symbol = tokens[2] || 'LINK/JPY';
-          direction = tokens[3] || '';
+        // 精算区分 판별 (유니코드 정규화 포함)
+        const normType = type.normalize ? type.normalize('NFKC') : type;
+
+        if (normType.includes('取引所レバレッジ取引')) {
+          // 결제손익
+          tradePnl = direction.includes('支払') && rawAmount > 0 ? -rawAmount : rawAmount;
+          // 거래 자체에 부과된 수수료가 있을 경우 수수료로 합산
+          if (fee > 0) managementFee += fee;
+        } else if (normType.includes('取引所レバレッジ手数料返金') || normType.includes('取引所レバレッジ⼿数料返⾦') || normType.includes('手数料返金')) {
+          // 수수료 반환 (受取): 관리수수료 차감(환급)
+          managementFee -= Math.abs(rawAmount);
+        } else if (normType.includes('取引所レバレッジ手数料') || normType.includes('手数料')) {
+          // 롤오버 관리수수료 (支払): 관리수수료 가산
+          managementFee += Math.abs(rawAmount);
         } else {
-          direction = tokens[tokens.length - 4] || '';
-          symbol = tokens[tokens.length - 5] || 'LINK/JPY';
-        }
-
-        if (direction.includes('支払') && amount > 0) {
-          amount = -amount;
-        } else if (direction.includes('受取') && amount < 0) {
-          amount = Math.abs(amount);
+          // 기타 구분
+          if (direction.includes('支払')) {
+            tradePnl = -Math.abs(rawAmount);
+          } else {
+            tradePnl = Math.abs(rawAmount);
+          }
+          if (fee > 0) managementFee += fee;
         }
 
         records.push({
           date: stdDate,
+          type: normType,
           symbol,
           direction,
-          amount,
-          fee: Math.abs(fee),
+          amount: tradePnl,
+          fee: managementFee,
           balance
         });
       });
       return records;
     }
 
+    // CSV 파일 및 텍스트 반영 시 기존 동일 날짜 내역 삭제 후 최신 데이터로 대체
     function importTextData(text) {
       const dict = i18n[currentLang] || i18n.ja;
       const newRecords = parseText(text);
@@ -1229,10 +1288,18 @@
         alert(dict.msgInvalidFormat);
         return;
       }
+
+      // 새로 입력될 날짜들의 Set 생성
+      const incomingDates = new Set(newRecords.map(r => r.date));
+
+      // 기존 데이터 중 새 파일에 포함된 날짜는 삭제
       const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const combined = [...existing, ...newRecords];
-      const unique = Array.from(new Map(combined.map(item => [JSON.stringify(item), item])).values());
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(unique));
+      const filteredExisting = existing.filter(r => !incomingDates.has(r.date));
+
+      // 기존 남은 데이터와 새 데이터 병합
+      const combined = [...filteredExisting, ...newRecords];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(combined));
+
       alert(`${newRecords.length} ${dict.msgSuccessImport}`);
       render();
     }
@@ -1249,8 +1316,11 @@
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(evt) { importTextData(evt.target.result); };
+      reader.onload = function(evt) { 
+        importTextData(evt.target.result); 
+      };
       reader.readAsText(file, 'utf-8');
+      e.target.value = '';
     }
 
     function addManualDailyRecord(e) {
@@ -1266,10 +1336,11 @@
       const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       records.push({
         date: stdDate,
+        type: '手動登録',
         symbol,
         direction: tradePnl >= 0 ? '受取' : '支払',
         amount: tradePnl,
-        fee: Math.abs(fee),
+        fee: fee,
         balance
       });
 
@@ -1294,10 +1365,11 @@
 
       records.push({
         date: dateStr,
+        type: '手動修正',
         symbol: editSymbol,
         direction: editTradePnl >= 0 ? '受取' : '支払',
         amount: editTradePnl,
-        fee: Math.abs(editFee),
+        fee: editFee,
         balance: editBalance
       });
 
@@ -1348,7 +1420,7 @@
       let totalTradePnl = 0;
       let totalFee = 0;
 
-      // 텍스트 상단에 위치한 최신 행의 잔고를 해당 날짜의 최종 잔고로 유지
+      // 파일 상단(가장 최신 거래)의 잔고를 해당 날짜의 확정 잔고로 우선 할당
       records.forEach(r => {
         const d = r.date;
         if (!dailyMap[d]) {
@@ -1368,18 +1440,17 @@
           dailyMap[d].tradePnl += r.amount;
           totalTradePnl += r.amount;
 
-          if (r.fee > 0) {
-            dailyMap[d].fees += r.fee;
-            totalFee += r.fee;
-          }
+          dailyMap[d].fees += r.fee;
+          totalFee += r.fee;
 
           if (r.symbol && r.symbol !== '기타') {
-            symbolMap[r.symbol] = (symbolMap[r.symbol] || 0) + r.amount;
+            symbolMap[r.symbol] = (symbolMap[r.symbol] || 0) + (r.amount - r.fee);
           }
           if (r.symbol) dailyMap[d].symbols.add(r.symbol);
         }
       });
 
+      // 날짜 오름차순(과거->최신) 정렬
       const dailyList = Object.values(dailyMap).sort((a, b) => new Date(a.date) - new Date(b.date));
       let latestBal = 0;
 
@@ -1408,11 +1479,26 @@
         }
       }
 
+      // 상단 2대 메인 KPI 지표 (실질 총자산 & 원금대비 수익률)
       document.getElementById('kpiTotalNetWorth').textContent = `¥${Math.round(totalNetWorth).toLocaleString()}`;
-      document.getElementById('kpiPrincipal').textContent = `¥${Math.round(finalPrincipal).toLocaleString()}`;
+      if (finalPrincipal > 0) {
+        const roiPercent = ((totalProfitWithUnrealized / finalPrincipal) * 100).toFixed(2);
+        const roiSign = roiPercent >= 0 ? '+' : '';
+        document.getElementById('kpiRoi').textContent = `${roiSign}${roiPercent}%`;
+        document.getElementById('kpiRoi').className = `text-xl lg:text-2xl font-black font-mono tracking-tight leading-tight ${roiPercent >= 0 ? 'text-rose-500' : 'text-sky-600'}`;
+      } else {
+        document.getElementById('kpiRoi').textContent = `-%`;
+        document.getElementById('kpiRoi').className = `text-xl lg:text-2xl font-black font-mono text-slate-400 leading-tight`;
+      }
 
+      // 하단 6대 보조 KPI 지표
+      document.getElementById('kpiPrincipal').textContent = `¥${Math.round(finalPrincipal).toLocaleString()}`;
+      
       document.getElementById('kpiTotalProfit').textContent = formatYen(totalProfitWithUnrealized);
       document.getElementById('kpiTotalProfit').className = `text-xl lg:text-2xl font-black font-mono tracking-tight ${totalProfitWithUnrealized >= 0 ? 'text-rose-600' : 'text-sky-700'}`;
+
+      document.getElementById('kpiRealizedPnl').textContent = formatYen(netRealizedPnl);
+      document.getElementById('kpiRealizedPnl').className = `text-xl lg:text-2xl font-black font-mono tracking-tight ${netRealizedPnl >= 0 ? 'text-emerald-700' : 'text-sky-700'}`;
 
       document.getElementById('kpiTotalFee').textContent = `-¥${Math.round(totalFee).toLocaleString()}`;
 
@@ -1420,16 +1506,6 @@
       document.getElementById('kpiUnrealizedSub').textContent = isActivePosMatch ? `${posData.symbol || 'LINK/JPY'} (${posData.amount || 0})` : '-';
 
       document.getElementById('kpiLatestBalance').textContent = `¥${Math.round(latestBal).toLocaleString()}`;
-
-      if (finalPrincipal > 0) {
-        const roiPercent = ((totalProfitWithUnrealized / finalPrincipal) * 100).toFixed(2);
-        const roiSign = roiPercent >= 0 ? '+' : '';
-        document.getElementById('kpiRoi').textContent = `${roiSign}${roiPercent}%`;
-        document.getElementById('kpiRoi').className = `text-xl lg:text-2xl font-black font-mono tracking-tight ${roiPercent >= 0 ? 'text-rose-500' : 'text-sky-600'}`;
-      } else {
-        document.getElementById('kpiRoi').textContent = `-%`;
-        document.getElementById('kpiRoi').className = `text-xl lg:text-2xl font-black font-mono text-slate-400`;
-      }
 
       renderTables(dailyList, latestBal);
       renderRecentTransactions(dailyList);
@@ -1657,7 +1733,7 @@
 
     function exportBackupJSON() {
       const backupData = {
-        version: '9.0', exportedAt: new Date().toISOString(),
+        version: '10.0', exportedAt: new Date().toISOString(),
         position: JSON.parse(localStorage.getItem(POSITION_STORAGE_KEY) || '{}'),
         records: JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
       };
@@ -1692,9 +1768,9 @@
       const dict = i18n[currentLang] || i18n.ja;
       const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       if (records.length === 0) return alert(dict.noDataText);
-      let csvContent = '\uFEFF日時,銘柄名,受取/支払,金額,手数料,残高\n';
+      let csvContent = '\uFEFF日時,精算区分,銘柄名,受取/支払,金額,手数料,残高\n';
       records.forEach(r => {
-        csvContent += `"${r.date}","${r.symbol}","${r.amount >= 0 ? '受取' : '支払'}","${r.amount} 円","${r.fee} 円","${r.balance} 円"\n`;
+        csvContent += `"${r.date}","${r.type}","${r.symbol}","${r.direction}","${r.amount} 円","${r.fee} 円","${r.balance} 円"\n`;
       });
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
