@@ -150,7 +150,7 @@
         </select>
       </div>
 
-      <!-- 다국어 툴바: 일본어, 영어, 한국어, 중국어, 스페인어 -->
+      <!-- 다국어 툴바 -->
       <div class="flex flex-wrap items-center gap-2.5 relative">
         <div class="flex bg-white rounded-2xl border border-slate-200 p-0.5 shadow-sm">
           <button id="lang-ja" onclick="setLanguage('ja')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">JP</button>
@@ -174,7 +174,7 @@
             <span class="text-xs font-extrabold text-slate-700" data-i18n="popupPasteTitle">取引履歴データの入力</span>
             <button onclick="togglePastePopup()" class="text-xs text-slate-400 hover:text-slate-600">✕</button>
           </div>
-          <textarea id="rawInput" rows="4" placeholder="CION.csv / Text..." class="w-full clay-input p-2.5 text-[11px] font-mono text-slate-600 mb-2"></textarea>
+          <textarea id="rawInput" rows="4" placeholder="日時  精算区分  銘柄名  受取/支払  金額  手数料  残高" class="w-full clay-input p-2.5 text-[11px] font-mono text-slate-600 mb-2"></textarea>
           <button onclick="processData()" class="w-full clay-button text-white font-bold text-xs py-2" data-i18n="popupBtnAnalyze">
             分析および反映
           </button>
@@ -182,7 +182,7 @@
       </div>
     </header>
 
-    <!-- [공통 지표] 7가지 동일 규격 3D 파스텔 KPI 핵심 지표 그리드 -->
+    <!-- [KPI 핵심 지표 그리드] -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
       <div class="clay-card-mint p-4 rounded-3xl flex flex-col justify-between relative overflow-hidden">
         <div class="flex justify-between items-start">
@@ -287,7 +287,6 @@
         </div>
       </div>
 
-      <!-- 최근 5건 거래 내역 -->
       <div class="clay-card p-6 shadow space-y-4">
         <div class="flex justify-between items-center pb-3 border-b border-slate-100">
           <div class="flex items-center gap-2">
@@ -340,10 +339,10 @@
             <label class="block text-xs font-bold text-slate-700" data-i18n="labelAssetType">💼 保有資産の種類</label>
             <div class="flex gap-2">
               <select id="posSymbol" onchange="handlePosSymbolChange()" class="w-full clay-input px-3 py-3 text-sm font-mono font-bold text-slate-800">
-                <option value="USD/JPY" selected>USD/JPY</option>
+                <option value="USD/JPY">USD/JPY</option>
                 <option value="USD/EUR">USD/EUR</option>
                 <option value="USD/AUD">USD/AUD</option>
-                <option value="LINK/JPY">LINK/JPY</option>
+                <option value="LINK/JPY" selected>LINK/JPY</option>
                 <option value="SOL/JPY">SOL/JPY</option>
                 <option value="BTC/JPY">BTC/JPY</option>
                 <option value="ETH/JPY">ETH/JPY</option>
@@ -378,10 +377,8 @@
       </div>
     </section>
 
-    <!-- ================= VIEW 3: 월별 집계 뷰 (월별 합계 카드 & 테이블 합계 행 추가) ================= -->
+    <!-- ================= VIEW 3: 월별 집계 뷰 ================= -->
     <section id="view-monthly" class="hidden space-y-6">
-      
-      <!-- 1. 월별 누적 종합 합계 카드 (4 Cards) -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="clay-card-peach p-5 rounded-3xl flex flex-col justify-between">
           <div class="flex justify-between items-start">
@@ -428,7 +425,6 @@
         </div>
       </div>
 
-      <!-- 2. 월별 집계 테이블 (하단 종합계 행 포함) -->
       <div class="clay-card p-6 shadow">
         <h3 class="text-sm font-bold text-slate-800 mb-4" data-i18n="monthlyTableTitle">📅 月別収益および手数料総合集計表</h3>
         <div class="overflow-x-auto">
@@ -448,7 +444,6 @@
           </table>
         </div>
       </div>
-
     </section>
 
     <!-- ================= VIEW 4: 일별 상세 내역 뷰 ================= -->
@@ -465,7 +460,7 @@
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-500 mb-1" data-i18n="thSymbol">取引資産</label>
-              <input type="text" id="newRecSymbol" placeholder="USD/JPY" value="USD/JPY" class="w-full clay-input px-2.5 py-1.5 text-slate-700">
+              <input type="text" id="newRecSymbol" placeholder="LINK/JPY" value="LINK/JPY" class="w-full clay-input px-2.5 py-1.5 text-slate-700">
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-500 mb-1" data-i18n="thTradePnl">決済損益 (円)</label>
@@ -473,7 +468,7 @@
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-500 mb-1" data-i18n="thFee">当日手数料 (円)</label>
-              <input type="number" id="newRecFee" placeholder="120" value="0" class="w-full clay-input px-2.5 py-1.5 text-slate-700 font-mono">
+              <input type="number" id="newRecFee" placeholder="0" value="0" class="w-full clay-input px-2.5 py-1.5 text-slate-700 font-mono">
             </div>
             <div>
               <label class="block text-[11px] font-semibold text-slate-500 mb-1" data-i18n="thDailyBal">当日残高 (円)</label>
@@ -506,7 +501,7 @@
       </div>
     </section>
 
-    <!-- ================= VIEW 5: 백업 (추출 / 반영) 뷰 ================= -->
+    <!-- ================= VIEW 5: 백업 뷰 ================= -->
     <section id="view-backup" class="hidden space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl">
         <div class="clay-card p-6 space-y-4">
@@ -548,7 +543,7 @@
   </main>
 
   <script>
-    const STORAGE_KEY = 'gmo_leverage_parsed_records_v7';
+    const STORAGE_KEY = 'gmo_leverage_parsed_records_v9';
     const POSITION_STORAGE_KEY = 'gmo_leverage_manual_position_v6';
     const LANG_STORAGE_KEY = 'gmo_leverage_lang_v4';
 
@@ -558,7 +553,6 @@
     let editingDate = null;
     let manualPrincipalOverride = false;
 
-    // 5개 국어 번역 사전
     const i18n = {
       ja: {
         appTitle: 'レバレッジ資産管理',
@@ -920,7 +914,7 @@
         backupImportDesc: '选择之前保存的 JSON 备份文件以恢复所有数据。',
         btnUploadJson: '选择备份文件并恢复 (.json)',
         msgResetConfirm: '确定要重置所有保存的交易记录和设置吗？',
-        msgDeleteConfirm: '的交易记录吗？',
+        msgDeleteConfirm: '의 거래 내역을 삭제하시겠습니까?',
         msgSuccessImport: '条交易记录已成功应用！',
         msgSuccessBackup: '备份数据已成功恢复！',
         msgInvalidFormat: '无法识别数据格式，请检查 CSV 或文本内容。',
@@ -1013,7 +1007,7 @@
         backupImportDesc: 'Seleccione un archivo JSON previamente guardado para restaurar todos los datos.',
         btnUploadJson: 'Seleccionar Archivo y Restaurar (.json)',
         msgResetConfirm: '¿Está seguro de que desea restablecer todos los registros y ajustes?',
-        msgDeleteConfirm: '¿Desea eliminar el registro de',
+        msgDeleteConfirm: '의 거래 내역을 삭제하시겠습니까?',
         msgSuccessImport: '¡transacciones aplicadas con éxito!',
         msgSuccessBackup: '¡Datos de copia de seguridad restaurados con éxito!',
         msgInvalidFormat: 'Formato no reconocido. Verifique el CSV o texto pegado.',
@@ -1175,6 +1169,7 @@
       return result;
     }
 
+    // 精算区分(2번째 열)을 제외하고 맨 끝 3개 컬럼(금액, 수수료, 잔고)을 기준으로 파싱
     function parseText(text) {
       const lines = text.trim().split(/\r?\n/);
       const records = [];
@@ -1193,17 +1188,36 @@
         const dateParts = rawDate.split('/');
         const stdDate = `${dateParts[0]}/${dateParts[1].padStart(2, '0')}/${dateParts[2].padStart(2, '0')}`;
 
-        const type = tokens[1] || '';
-        const symbol = tokens[2] || '기타';
-        const direction = tokens[3] || '';
-        let amount = cleanNumber(tokens[4]);
-        let fee = cleanNumber(tokens[5]);
-        let balance = cleanNumber(tokens[6]);
+        // 맨 마지막 열이 잔고(残高), 그 앞이 수수료(手数料), 그 앞이 금액(金額)
+        const balance = cleanNumber(tokens[tokens.length - 1]);
+        const fee = cleanNumber(tokens[tokens.length - 2]);
+        let amount = cleanNumber(tokens[tokens.length - 3]);
 
-        if (direction.includes('支払') && amount > 0) amount = -amount;
-        if (type.includes('手数料') && amount > 0) amount = -amount;
+        let direction = '';
+        let symbol = 'LINK/JPY';
 
-        records.push({ date: stdDate, type, symbol, direction, amount, fee: Math.abs(fee), balance });
+        if (tokens.length >= 7) {
+          symbol = tokens[2] || 'LINK/JPY';
+          direction = tokens[3] || '';
+        } else {
+          direction = tokens[tokens.length - 4] || '';
+          symbol = tokens[tokens.length - 5] || 'LINK/JPY';
+        }
+
+        if (direction.includes('支払') && amount > 0) {
+          amount = -amount;
+        } else if (direction.includes('受取') && amount < 0) {
+          amount = Math.abs(amount);
+        }
+
+        records.push({
+          date: stdDate,
+          symbol,
+          direction,
+          amount,
+          fee: Math.abs(fee),
+          balance
+        });
       });
       return records;
     }
@@ -1218,7 +1232,6 @@
       const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       const combined = [...existing, ...newRecords];
       const unique = Array.from(new Map(combined.map(item => [JSON.stringify(item), item])).values());
-      unique.sort((a, b) => new Date(a.date) - new Date(b.date));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(unique));
       alert(`${newRecords.length} ${dict.msgSuccessImport}`);
       render();
@@ -1245,17 +1258,21 @@
       const rawDate = document.getElementById('newRecDate').value;
       if (!rawDate) return;
       const stdDate = rawDate.replace(/-/g, '/');
-      const symbol = document.getElementById('newRecSymbol').value || 'USD/JPY';
+      const symbol = document.getElementById('newRecSymbol').value || 'LINK/JPY';
       const tradePnl = Number(document.getElementById('newRecTradePnl').value) || 0;
       const fee = Number(document.getElementById('newRecFee').value) || 0;
       const balance = Number(document.getElementById('newRecBalance').value) || 0;
 
       const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      if (tradePnl !== 0) records.push({ date: stdDate, type: '取引所レバレッジ取引', symbol, direction: tradePnl >= 0 ? '受取' : '支払', amount: tradePnl, fee: 0, balance });
-      if (fee !== 0) records.push({ date: stdDate, type: '取引所レバレッジ手数料', symbol, direction: '支払', amount: -Math.abs(fee), fee: 0, balance });
-      if (tradePnl === 0 && fee === 0 && balance > 0) records.push({ date: stdDate, type: '残高記録', symbol, direction: '', amount: 0, fee: 0, balance });
+      records.push({
+        date: stdDate,
+        symbol,
+        direction: tradePnl >= 0 ? '受取' : '支払',
+        amount: tradePnl,
+        fee: Math.abs(fee),
+        balance
+      });
 
-      records.sort((a, b) => new Date(a.date) - new Date(b.date));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 
       document.getElementById('newRecTradePnl').value = '0';
@@ -1275,11 +1292,15 @@
       let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       records = records.filter(r => r.date !== dateStr);
 
-      if (editTradePnl !== 0) records.push({ date: dateStr, type: '取引所レバレッジ取引', symbol: editSymbol, direction: editTradePnl >= 0 ? '受取' : '支払', amount: editTradePnl, fee: 0, balance: editBalance });
-      if (editFee !== 0) records.push({ date: dateStr, type: '取引所レバレッジ手数料', symbol: editSymbol, direction: '支払', amount: -Math.abs(editFee), fee: 0, balance: editBalance });
-      if (editTradePnl === 0 && editFee === 0) records.push({ date: dateStr, type: '残高記録', symbol: editSymbol, direction: '', amount: 0, fee: 0, balance: editBalance });
+      records.push({
+        date: dateStr,
+        symbol: editSymbol,
+        direction: editTradePnl >= 0 ? '受取' : '支払',
+        amount: editTradePnl,
+        fee: Math.abs(editFee),
+        balance: editBalance
+      });
 
-      records.sort((a, b) => new Date(a.date) - new Date(b.date));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
       editingDate = null;
       render();
@@ -1326,31 +1347,42 @@
       const symbolMap = {};
       let totalTradePnl = 0;
       let totalFee = 0;
-      let latestBal = 0;
 
+      // 텍스트 상단에 위치한 최신 행의 잔고를 해당 날짜의 최종 잔고로 유지
       records.forEach(r => {
         const d = r.date;
         if (!dailyMap[d]) {
-          dailyMap[d] = { date: d, tradePnl: 0, fees: 0, netPnl: 0, balance: 0, symbols: new Set() };
+          dailyMap[d] = { 
+            date: d, 
+            tradePnl: 0, 
+            fees: 0, 
+            netPnl: 0, 
+            balance: r.balance > 0 ? r.balance : 0, 
+            symbols: new Set() 
+          };
+        } else if (dailyMap[d].balance === 0 && r.balance > 0) {
+          dailyMap[d].balance = r.balance;
         }
-        if (r.balance > 0) dailyMap[d].balance = r.balance;
 
         if (activeFilter === 'ALL' || r.symbol === activeFilter) {
-          if (r.type.includes('手数料')) {
-            dailyMap[d].fees += Math.abs(r.amount);
-            totalFee += Math.abs(r.amount);
-          } else {
-            dailyMap[d].tradePnl += r.amount;
-            totalTradePnl += r.amount;
-            if (r.symbol && r.symbol !== '기타') {
-              symbolMap[r.symbol] = (symbolMap[r.symbol] || 0) + r.amount;
-            }
+          dailyMap[d].tradePnl += r.amount;
+          totalTradePnl += r.amount;
+
+          if (r.fee > 0) {
+            dailyMap[d].fees += r.fee;
+            totalFee += r.fee;
+          }
+
+          if (r.symbol && r.symbol !== '기타') {
+            symbolMap[r.symbol] = (symbolMap[r.symbol] || 0) + r.amount;
           }
           if (r.symbol) dailyMap[d].symbols.add(r.symbol);
         }
       });
 
       const dailyList = Object.values(dailyMap).sort((a, b) => new Date(a.date) - new Date(b.date));
+      let latestBal = 0;
+
       dailyList.forEach(d => {
         d.netPnl = d.tradePnl - d.fees;
         if (d.balance > 0) latestBal = d.balance;
@@ -1385,7 +1417,7 @@
       document.getElementById('kpiTotalFee').textContent = `-¥${Math.round(totalFee).toLocaleString()}`;
 
       document.getElementById('kpiUnrealizedPnl').textContent = formatYen(activeUnrealizedPnl);
-      document.getElementById('kpiUnrealizedSub').textContent = isActivePosMatch ? `${posData.symbol || 'USD/JPY'} (${posData.amount || 0})` : '-';
+      document.getElementById('kpiUnrealizedSub').textContent = isActivePosMatch ? `${posData.symbol || 'LINK/JPY'} (${posData.amount || 0})` : '-';
 
       document.getElementById('kpiLatestBalance').textContent = `¥${Math.round(latestBal).toLocaleString()}`;
 
@@ -1431,7 +1463,6 @@
       });
     }
 
-    // ⭐ 월별 집계표 및 월별 합계 카드/행 렌더링
     function renderTables(dailyList, currentBal) {
       const dict = i18n[currentLang] || i18n.ja;
       
@@ -1455,7 +1486,6 @@
         grandTotalNetPnl += d.netPnl;
       });
 
-      // 1. 월별 집계 상단 4대 합계 카드 갱신
       document.getElementById('monthlyTotalTradePnl').textContent = formatYen(grandTotalTradePnl);
       document.getElementById('monthlyTotalTradePnl').className = `text-xl lg:text-2xl font-black font-mono tracking-tight ${grandTotalTradePnl >= 0 ? 'text-rose-600' : 'text-sky-700'}`;
 
@@ -1475,7 +1505,6 @@
       if (monthlyList.length === 0) {
         mBody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-semibold">${dict.noDataText}</td></tr>`;
       } else {
-        // 개별 월 렌더링
         monthlyList.slice().reverse().forEach(m => {
           const roi = m.startBalance > 0 ? ((m.netPnl / m.startBalance) * 100).toFixed(1) : '-';
           const tr = document.createElement('tr');
@@ -1491,7 +1520,6 @@
           mBody.appendChild(tr);
         });
 
-        // 2. 테이블 최하단 총합계(総合計) 행 렌더링
         const initialBalance = monthlyList[0].startBalance;
         const totalRoi = initialBalance > 0 ? ((grandTotalNetPnl / initialBalance) * 100).toFixed(1) : '-';
 
@@ -1508,7 +1536,6 @@
         mFoot.appendChild(footTr);
       }
 
-      // 일별 테이블 렌더링
       const dBody = document.getElementById('dailyTableBody');
       dBody.innerHTML = '';
       if (dailyList.length === 0) {
@@ -1519,7 +1546,7 @@
           tr.className = 'hover:bg-slate-50/80 transition';
 
           if (editingDate === d.date) {
-            const symbolsStr = Array.from(d.symbols).join(', ') || 'USD/JPY';
+            const symbolsStr = Array.from(d.symbols).join(', ') || 'LINK/JPY';
             tr.className = 'bg-sky-50/70 border border-sky-200';
             tr.innerHTML = `
               <td class="p-2 font-mono font-bold text-sky-600">${d.date}</td>
@@ -1630,7 +1657,7 @@
 
     function exportBackupJSON() {
       const backupData = {
-        version: '7.0', exportedAt: new Date().toISOString(),
+        version: '9.0', exportedAt: new Date().toISOString(),
         position: JSON.parse(localStorage.getItem(POSITION_STORAGE_KEY) || '{}'),
         records: JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
       };
@@ -1665,9 +1692,9 @@
       const dict = i18n[currentLang] || i18n.ja;
       const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       if (records.length === 0) return alert(dict.noDataText);
-      let csvContent = '\uFEFF日時,精算区分,銘柄名,受取/支払,金額,手数料,残高\n';
+      let csvContent = '\uFEFF日時,銘柄名,受取/支払,金額,手数料,残高\n';
       records.forEach(r => {
-        csvContent += `"${r.date}","${r.type}","${r.symbol}","${r.amount >= 0 ? '受取' : '支払'}","${r.amount} 円","${r.fee} 円","${r.balance} 円"\n`;
+        csvContent += `"${r.date}","${r.symbol}","${r.amount >= 0 ? '受取' : '支払'}","${r.amount} 円","${r.fee} 円","${r.balance} 円"\n`;
       });
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
