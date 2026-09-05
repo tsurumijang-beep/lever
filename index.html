@@ -93,9 +93,8 @@
     ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row antialiased select-none">
+<body class="min-h-screen flex flex-col md:flex-row antialiased select-text">
 
-  <!-- ================= LNB (좌측 사이드바) ================= -->
   <aside class="w-full md:w-84 lg:w-96 bg-white/85 backdrop-blur-md border-r border-slate-200/80 flex flex-col justify-between shrink-0 p-6 z-20">
     <div class="space-y-8">
       <div class="flex items-center gap-3.5 px-2">
@@ -141,10 +140,8 @@
     </div>
   </aside>
 
-  <!-- ================= 메인 콘텐츠 영역 ================= -->
   <main class="flex-1 p-6 lg:p-8 space-y-6 overflow-y-auto w-full max-w-[2200px]">
     
-    <!-- Top Bar & 상단 2대 메인 KPI 지표 -->
     <header class="flex flex-col xl:flex-row justify-between items-start xl:items-center pb-5 border-b border-slate-200/80 gap-5">
       <div class="flex flex-wrap items-center gap-4">
         <h2 id="viewTitle" class="text-xl md:text-2xl font-extrabold text-slate-800 flex items-center gap-2">
@@ -155,9 +152,7 @@
         </select>
       </div>
 
-      <!-- 상단 메인 2대 KPI 카드 및 글로벌 툴바 -->
       <div class="flex flex-wrap items-center gap-3.5 w-full xl:w-auto">
-        <!-- 1. 실질 총자산 -->
         <div class="clay-card-mint px-5 py-3 rounded-2xl flex items-center gap-3.5 shadow-md flex-1 sm:flex-initial min-w-[200px]">
           <div class="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center text-2xl">💎</div>
           <div>
@@ -166,7 +161,6 @@
           </div>
         </div>
 
-        <!-- 2. 원금 대비 수익률 -->
         <div class="clay-card px-5 py-3 rounded-2xl flex items-center gap-3.5 shadow-md flex-1 sm:flex-initial min-w-[180px]">
           <div class="w-10 h-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-2xl">🎯</div>
           <div>
@@ -175,7 +169,6 @@
           </div>
         </div>
 
-        <!-- 다국어 툴바, 파일/텍스트 첨부, 데이터 초기화 버튼 -->
         <div class="flex flex-wrap items-center gap-2 relative ml-auto">
           <div class="flex bg-white rounded-2xl border border-slate-200 p-0.5 shadow-sm">
             <button id="lang-ja" onclick="setLanguage('ja')" class="px-2.5 py-1.5 rounded-xl text-xs font-black transition">JP</button>
@@ -212,9 +205,7 @@
       </div>
     </header>
 
-    <!-- [하단 6대 보조 KPI 지표 그리드] -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      <!-- 1. 초기 투자 원본 -->
       <div class="clay-card p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-slate-500" data-i18n="kpiPrincipalTitle">初期投資元本</span>
@@ -226,7 +217,6 @@
         <div class="text-[10px] font-semibold text-slate-400 truncate" data-i18n="kpiPrincipalSub">総資産 - 総損益 (自動算出)</div>
       </div>
 
-      <!-- 2. 누적 총손익 -->
       <div class="clay-card-peach p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-rose-800" data-i18n="kpiTotalProfitTitle">累積総損益</span>
@@ -238,7 +228,6 @@
         <div id="kpiTotalProfitSub" class="text-[10px] font-semibold text-rose-700/80 truncate" data-i18n="kpiTotalProfitSub">確定損益 + 含み損益</div>
       </div>
 
-      <!-- 3. 확정 순수익 -->
       <div class="clay-card-emerald p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-emerald-800" data-i18n="kpiRealizedPnlTitle">確定純損益</span>
@@ -250,7 +239,6 @@
         <div id="kpiRealizedPnlSub" class="text-[10px] font-semibold text-emerald-700/80 truncate" data-i18n="kpiRealizedPnlSub">決済損益 - 手数料</div>
       </div>
 
-      <!-- 4. 누적 관리 수수료 -->
       <div class="clay-card-amber p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-amber-800" data-i18n="kpiTotalFeeTitle">累積管理手数料</span>
@@ -262,7 +250,6 @@
         <div class="text-[10px] font-semibold text-amber-700/80 truncate" data-i18n="kpiTotalFeeSub">06:00 ロールオーバー費</div>
       </div>
 
-      <!-- 5. 미실현 손익 -->
       <div class="clay-card-lavender p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-purple-800" data-i18n="kpiUnrealizedTitle">未実現損益 (含み益)</span>
@@ -274,7 +261,6 @@
         <div id="kpiUnrealizedSub" class="text-[10px] font-semibold text-purple-600/80 truncate" data-i18n="kpiUnrealizedSub">保有ポジション評価額</div>
       </div>
 
-      <!-- 6. 확정 일본엔 잔고 -->
       <div class="clay-card-sky p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
           <span class="text-xs font-bold text-sky-800" data-i18n="kpiBalanceTitle">確定日本円残高</span>
@@ -287,7 +273,6 @@
       </div>
     </div>
 
-    <!-- ================= VIEW 1: 대시보드 뷰 ================= -->
     <section id="view-dashboard" class="space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 clay-card p-6">
@@ -341,7 +326,6 @@
       </div>
     </section>
 
-    <!-- ================= VIEW 2: 자산 설정 뷰 ================= -->
     <section id="view-settings" class="hidden space-y-6 max-w-4xl">
       <div class="clay-card p-8 space-y-6">
         <div class="border-b border-slate-100 pb-4">
@@ -402,7 +386,6 @@
       </div>
     </section>
 
-    <!-- ================= VIEW 3: 월별 집계 뷰 ================= -->
     <section id="view-monthly" class="hidden space-y-6">
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="clay-card-peach p-5 rounded-3xl flex flex-col justify-between">
@@ -471,7 +454,6 @@
       </div>
     </section>
 
-    <!-- ================= VIEW 4: 일별 상세 내역 뷰 ================= -->
     <section id="view-daily" class="hidden space-y-6">
       <div class="clay-card p-6 space-y-6">
         
@@ -536,7 +518,6 @@
       </div>
     </section>
 
-    <!-- ================= VIEW 5: 백업 뷰 ================= -->
     <section id="view-backup" class="hidden space-y-6">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl">
         <div class="clay-card p-6 space-y-4">
@@ -1214,7 +1195,6 @@
       return result;
     }
 
-    // 精算区分 기반 [결제손익 vs 관리수수료] 분기 처리
     function parseText(text) {
       const lines = text.trim().split(/\r?\n/);
       const records = [];
@@ -1233,7 +1213,7 @@
         const dateParts = rawDate.split('/');
         const stdDate = `${dateParts[0]}/${dateParts[1].padStart(2, '0')}/${dateParts[2].padStart(2, '0')}`;
 
-        const type = tokens[1] || ''; // 精算区分
+        const type = tokens[1] || '';
         const symbol = tokens[2] || 'LINK/JPY';
         const direction = tokens[3] || '';
         const rawAmount = cleanNumber(tokens[4]);
@@ -1243,22 +1223,16 @@
         let tradePnl = 0;
         let managementFee = 0;
 
-        // 精算区分 판별 (유니코드 정규화 포함)
         const normType = type.normalize ? type.normalize('NFKC') : type;
 
         if (normType.includes('取引所レバレッジ取引')) {
-          // 결제손익
           tradePnl = direction.includes('支払') && rawAmount > 0 ? -rawAmount : rawAmount;
-          // 거래 자체에 부과된 수수료가 있을 경우 수수료로 합산
           if (fee > 0) managementFee += fee;
         } else if (normType.includes('取引所レバレッジ手数料返金') || normType.includes('取引所レバレッジ⼿数料返⾦') || normType.includes('手数料返金')) {
-          // 수수료 반환 (受取): 관리수수료 차감(환급)
           managementFee -= Math.abs(rawAmount);
         } else if (normType.includes('取引所レバレッジ手数料') || normType.includes('手数料')) {
-          // 롤오버 관리수수료 (支払): 관리수수료 가산
           managementFee += Math.abs(rawAmount);
         } else {
-          // 기타 구분
           if (direction.includes('支払')) {
             tradePnl = -Math.abs(rawAmount);
           } else {
@@ -1280,7 +1254,6 @@
       return records;
     }
 
-    // CSV 파일 및 텍스트 반영 시 기존 동일 날짜 내역 삭제 후 최신 데이터로 대체
     function importTextData(text) {
       const dict = i18n[currentLang] || i18n.ja;
       const newRecords = parseText(text);
@@ -1289,14 +1262,10 @@
         return;
       }
 
-      // 새로 입력될 날짜들의 Set 생성
       const incomingDates = new Set(newRecords.map(r => r.date));
-
-      // 기존 데이터 중 새 파일에 포함된 날짜는 삭제
       const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       const filteredExisting = existing.filter(r => !incomingDates.has(r.date));
 
-      // 기존 남은 데이터와 새 데이터 병합
       const combined = [...filteredExisting, ...newRecords];
       localStorage.setItem(STORAGE_KEY, JSON.stringify(combined));
 
@@ -1420,7 +1389,6 @@
       let totalTradePnl = 0;
       let totalFee = 0;
 
-      // 파일 상단(가장 최신 거래)의 잔고를 해당 날짜의 확정 잔고로 우선 할당
       records.forEach(r => {
         const d = r.date;
         if (!dailyMap[d]) {
@@ -1450,7 +1418,6 @@
         }
       });
 
-      // 날짜 오름차순(과거->최신) 정렬
       const dailyList = Object.values(dailyMap).sort((a, b) => new Date(a.date) - new Date(b.date));
       let latestBal = 0;
 
@@ -1479,7 +1446,6 @@
         }
       }
 
-      // 상단 2대 메인 KPI 지표 (실질 총자산 & 원금대비 수익률)
       document.getElementById('kpiTotalNetWorth').textContent = `¥${Math.round(totalNetWorth).toLocaleString()}`;
       if (finalPrincipal > 0) {
         const roiPercent = ((totalProfitWithUnrealized / finalPrincipal) * 100).toFixed(2);
@@ -1491,7 +1457,6 @@
         document.getElementById('kpiRoi').className = `text-xl lg:text-2xl font-black font-mono text-slate-400 leading-tight`;
       }
 
-      // 하단 6대 보조 KPI 지표
       document.getElementById('kpiPrincipal').textContent = `¥${Math.round(finalPrincipal).toLocaleString()}`;
       
       document.getElementById('kpiTotalProfit').textContent = formatYen(totalProfitWithUnrealized);
