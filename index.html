@@ -6,6 +6,7 @@
   <title>レバレッジ資産管理システム</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -179,8 +180,8 @@
           </div>
 
           <label class="cursor-pointer clay-button text-white font-bold text-xs px-3.5 py-2 flex items-center gap-1.5 shadow-md">
-            <span>📂</span> <span data-i18n="btnCsvUpload">CSV 添付</span>
-            <input type="file" id="csvFileInput" accept=".csv, .txt" class="hidden" onchange="handleFileUpload(event)">
+            <span>📂</span> <span data-i18n="btnCsvUpload">Excel 添付</span>
+            <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="handleExcelUpload(event)">
           </label>
           
           <button onclick="togglePastePopup()" class="bg-white hover:bg-slate-50 text-slate-600 font-bold border border-slate-200 text-xs px-3.5 py-2 rounded-2xl shadow-sm transition flex items-center gap-1.5">
@@ -263,7 +264,7 @@
 
       <div class="clay-card-sky p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
-          <span class="text-xs font-bold text-sky-800" data-i18n="kpiBalanceTitle">確定日本円残高</span>
+          <span class="text-xs font-bold text-sky-800" data-i18n="kpiBalanceTitle">累積投資額 (元本)</span>
           <span class="text-base">🏦</span>
         </div>
         <div class="my-2">
@@ -587,7 +588,7 @@
         viewTitleDaily: '日別詳細取引履歴',
         viewTitleBackup: 'データバックアップおよび復元',
         filterAllAssets: '全資産総合',
-        btnCsvUpload: 'CSV 添付',
+        btnCsvUpload: 'Excel 添付',
         btnPasteText: 'テキスト貼付',
         popupPasteTitle: '取引履歴データの入力',
         popupBtnAnalyze: '分析および反映',
@@ -603,7 +604,7 @@
         kpiTotalFeeSub: '06:00 ロールオーバー費',
         kpiUnrealizedTitle: '未実現損益 (含み益)',
         kpiUnrealizedSub: '保有ポジション評価額',
-        kpiBalanceTitle: '確定日本円残高',
+        kpiBalanceTitle: '累積投資額 (元本)',
         kpiBalanceSub: '最新精算データ基準',
         kpiRoiTitle: '元本対比収益率',
         kpiRoiSub: '総損益 ÷ 初期元本',
@@ -655,9 +656,10 @@
         msgResetConfirm: '保存されているすべての取引履歴と設定データを初期化しますか？',
         msgDeleteConfirm: 'の取引履歴を削除しますか？',
         msgSuccessImport: '件の取引履歴を正常に反映しました！',
+        msgNoNewData: '新しく追加された取引履歴はありませんでした（すべて反映済みです）。',
         msgSuccessBackup: 'バックアップデータを正常に復元しました！',
-        msgInvalidFormat: 'データ形式を認識できませんでした。CSVまたはテキストを確認してください。',
-        noDataText: 'データがありません。CSVをアップロードするか直接追加してください。',
+        msgInvalidFormat: 'データ形式を認識できませんでした。Excelファイルまたはテキストを確認してください。',
+        noDataText: 'データがありません。Excelをアップロードするか直接追加してください。',
         chartLabelNetPnl: '累積純損益 (円)',
         chartLabelBalance: '確定残高 (円)',
         btnEdit: '編集',
@@ -682,7 +684,7 @@
         viewTitleDaily: 'Daily Detailed Transactions',
         viewTitleBackup: 'Data Backup & Restore',
         filterAllAssets: 'All Assets Total',
-        btnCsvUpload: 'Upload CSV',
+        btnCsvUpload: 'Upload Excel',
         btnPasteText: 'Paste Text',
         popupPasteTitle: 'Input Transaction History',
         popupBtnAnalyze: 'Analyze & Apply',
@@ -750,9 +752,10 @@
         msgResetConfirm: 'Are you sure you want to reset all stored records and settings?',
         msgDeleteConfirm: 'Are you sure you want to delete the record of',
         msgSuccessImport: ' transactions have been successfully applied!',
+        msgNoNewData: 'No new transactions found (everything is already up to date).',
         msgSuccessBackup: 'Backup data has been successfully restored!',
-        msgInvalidFormat: 'Invalid format. Please check your CSV or pasted text.',
-        noDataText: 'No data available. Please upload a CSV or add daily records.',
+        msgInvalidFormat: 'Invalid format. Please check your Excel file or pasted text.',
+        noDataText: 'No data available. Please upload an Excel file or add daily records.',
         chartLabelNetPnl: 'Cumulative Net PnL (JPY)',
         chartLabelBalance: 'Settled Balance (JPY)',
         btnEdit: 'Edit',
@@ -777,7 +780,7 @@
         viewTitleDaily: '일별 상세 거래 내역',
         viewTitleBackup: '데이터 백업 및 복원',
         filterAllAssets: '전체 자산 종합',
-        btnCsvUpload: 'CSV 첨부',
+        btnCsvUpload: '엑셀 첨부',
         btnPasteText: '텍스트 붙여넣기',
         popupPasteTitle: '거래내역 데이터 입력',
         popupBtnAnalyze: '분석 및 반영',
@@ -845,9 +848,10 @@
         msgResetConfirm: '저장된 모든 거래 내역과 입력 데이터를 초기화하시겠습니까?',
         msgDeleteConfirm: '의 거래 내역을 삭제하시겠습니까?',
         msgSuccessImport: '건의 거래 내역을 성공적으로 반영했습니다!',
+        msgNoNewData: '새로 추가된 거래 내역이 없습니다 (이미 모두 반영되어 있습니다).',
         msgSuccessBackup: '백업 데이터를 성공적으로 복원했습니다!',
-        msgInvalidFormat: '데이터 형식을 인식하지 못했습니다. CSV나 텍스트를 확인해 주세요.',
-        noDataText: '데이터가 없습니다. CSV를 업로드하거나 직접 추가해 주세요.',
+        msgInvalidFormat: '데이터 형식을 인식하지 못했습니다. 엑셀 파일이나 텍스트를 확인해 주세요.',
+        noDataText: '데이터가 없습니다. 엑셀을 업로드하거나 직접 추가해 주세요.',
         chartLabelNetPnl: '누적 순손익 (円)',
         chartLabelBalance: '확정 잔고 (円)',
         btnEdit: '수정',
@@ -872,7 +876,7 @@
         viewTitleDaily: '每日详细交易记录',
         viewTitleBackup: '数据备份与恢复',
         filterAllAssets: '全部资产汇总',
-        btnCsvUpload: '上传 CSV',
+        btnCsvUpload: '上传 Excel',
         btnPasteText: '粘贴文本',
         popupPasteTitle: '输入交易记录数据',
         popupBtnAnalyze: '分析并应用',
@@ -940,9 +944,10 @@
         msgResetConfirm: '确定要重置所有保存的交易记录和设置吗？',
         msgDeleteConfirm: '의 거래 내역을 삭제하시겠습니까?',
         msgSuccessImport: '条交易记录已成功应用！',
+        msgNoNewData: '没有新增的交易记录（数据已是最新）。',
         msgSuccessBackup: '备份数据已成功恢复！',
-        msgInvalidFormat: '无法识别数据格式，请检查 CSV 或文本内容。',
-        noDataText: '暂无数据。请上传 CSV 或直接添加每日记录。',
+        msgInvalidFormat: '无法识别数据格式，请检查 Excel 文件或文本内容。',
+        noDataText: '暂无数据。请上传 Excel 文件或直接添加每日记录。',
         chartLabelNetPnl: '累计净盈亏 (日元)',
         chartLabelBalance: '结算余额 (日元)',
         btnEdit: '编辑',
@@ -967,7 +972,7 @@
         viewTitleDaily: 'Transacciones Diarias Detalladas',
         viewTitleBackup: 'Copia de Seguridad y Restauración',
         filterAllAssets: 'Todos los Activos',
-        btnCsvUpload: 'Adjuntar CSV',
+        btnCsvUpload: 'Adjuntar Excel',
         btnPasteText: 'Pegar Texto',
         popupPasteTitle: 'Entrada de Historial de Transacciones',
         popupBtnAnalyze: 'Analizar y Aplicar',
@@ -1035,9 +1040,10 @@
         msgResetConfirm: '¿Está seguro de que desea restablecer todos los registros y ajustes?',
         msgDeleteConfirm: '의 거래 내역을 삭제하시겠습니까?',
         msgSuccessImport: '¡transacciones aplicadas con éxito!',
+        msgNoNewData: 'No se encontraron transacciones nuevas (ya está todo actualizado).',
         msgSuccessBackup: '¡Datos de copia de seguridad restaurados con éxito!',
-        msgInvalidFormat: 'Formato no reconocido. Verifique el CSV o texto pegado.',
-        noDataText: 'No hay datos disponibles. Suba un CSV o añada registros diarios.',
+        msgInvalidFormat: 'Formato no reconocido. Verifique el archivo Excel o el texto pegado.',
+        noDataText: 'No hay datos disponibles. Suba un archivo Excel o añada registros diarios.',
         chartLabelNetPnl: 'Ganancia Neta Acumulada (JPY)',
         chartLabelBalance: 'Saldo Liquidado (JPY)',
         btnEdit: 'Editar',
@@ -1181,18 +1187,66 @@
       if (posData.margin) document.getElementById('posMargin').value = posData.margin;
     }
 
-    function parseCSVLine(text) {
+    function parseCSVLine(text, delimiter = ',') {
       const result = [];
       let cur = '';
       let inQuotes = false;
       for (let i = 0; i < text.length; i++) {
         const c = text[i];
         if (c === '"') { inQuotes = !inQuotes; } 
-        else if ((c === ',' || c === '\t') && !inQuotes) { result.push(cur.trim()); cur = ''; } 
+        else if (c === delimiter && !inQuotes) { result.push(cur.trim()); cur = ''; } 
         else { cur += c; }
       }
       result.push(cur.trim());
       return result;
+    }
+
+    function buildRecordFromTokens(tokens) {
+      if (!tokens || tokens.length < 5) return null;
+
+      let rawDate = String(tokens[0] || '').replace(/-/g, '/').slice(0, 10);
+      if (!/^\d{4}\/\d{1,2}\/\d{1,2}/.test(rawDate)) return null;
+
+      const dateParts = rawDate.split('/');
+      const stdDate = `${dateParts[0]}/${dateParts[1].padStart(2, '0')}/${dateParts[2].padStart(2, '0')}`;
+
+      const type = tokens[1] || '';
+      const symbol = tokens[2] || 'LINK/JPY';
+      const direction = tokens[3] || '';
+      const rawAmount = cleanNumber(tokens[4]);
+      const fee = cleanNumber(tokens[5]);
+      const balance = cleanNumber(tokens[6]);
+
+      let tradePnl = 0;
+      let managementFee = 0;
+
+      const normType = type.normalize ? type.normalize('NFKC') : type;
+
+      if (normType.includes('取引所レバレッジ取引')) {
+        tradePnl = direction.includes('支払') && rawAmount > 0 ? -rawAmount : rawAmount;
+        if (fee > 0) managementFee += fee;
+      } else if (normType.includes('取引所レバレッジ手数料返金') || normType.includes('取引所レバレッジ⼿数料返⾦') || normType.includes('手数料返金')) {
+        managementFee -= Math.abs(rawAmount);
+      } else if (normType.includes('取引所レバレッジ手数料') || normType.includes('手数料')) {
+        managementFee += Math.abs(rawAmount);
+      } else {
+        if (direction.includes('支払')) {
+          tradePnl = -Math.abs(rawAmount);
+        } else {
+          tradePnl = Math.abs(rawAmount);
+        }
+        if (fee > 0) managementFee += fee;
+      }
+
+      return {
+        date: stdDate,
+        type: normType,
+        symbol,
+        direction,
+        amount: tradePnl,
+        fee: managementFee,
+        balance
+      };
     }
 
     function parseText(text) {
@@ -1203,74 +1257,58 @@
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith('日時') || trimmed.startsWith('﻿日時')) return;
 
-        let tokens = parseCSVLine(trimmed);
+        // Prefer tab as the delimiter when present (e.g. pasted from a
+        // spreadsheet or the exchange's own page), since amounts like
+        // "202,415 円" contain a thousands-separator comma that must not
+        // be mistaken for a field separator. Only fall back to comma
+        // splitting for genuine comma-separated CSV lines without tabs.
+        const delimiter = trimmed.includes('\t') ? '\t' : ',';
+        let tokens = parseCSVLine(trimmed, delimiter);
         if (tokens.length < 5) tokens = trimmed.split(/[\t ]+/);
         if (tokens.length < 5) return;
 
-        let rawDate = tokens[0].replace(/-/g, '/').slice(0, 10);
-        if (!/^\d{4}\/\d{1,2}\/\d{1,2}/.test(rawDate)) return;
-
-        const dateParts = rawDate.split('/');
-        const stdDate = `${dateParts[0]}/${dateParts[1].padStart(2, '0')}/${dateParts[2].padStart(2, '0')}`;
-
-        const type = tokens[1] || '';
-        const symbol = tokens[2] || 'LINK/JPY';
-        const direction = tokens[3] || '';
-        const rawAmount = cleanNumber(tokens[4]);
-        const fee = cleanNumber(tokens[5]);
-        const balance = cleanNumber(tokens[6]);
-
-        let tradePnl = 0;
-        let managementFee = 0;
-
-        const normType = type.normalize ? type.normalize('NFKC') : type;
-
-        if (normType.includes('取引所レバレッジ取引')) {
-          tradePnl = direction.includes('支払') && rawAmount > 0 ? -rawAmount : rawAmount;
-          if (fee > 0) managementFee += fee;
-        } else if (normType.includes('取引所レバレッジ手数料返金') || normType.includes('取引所レバレッジ⼿数料返⾦') || normType.includes('手数料返金')) {
-          managementFee -= Math.abs(rawAmount);
-        } else if (normType.includes('取引所レバレッジ手数料') || normType.includes('手数料')) {
-          managementFee += Math.abs(rawAmount);
-        } else {
-          if (direction.includes('支払')) {
-            tradePnl = -Math.abs(rawAmount);
-          } else {
-            tradePnl = Math.abs(rawAmount);
-          }
-          if (fee > 0) managementFee += fee;
-        }
-
-        records.push({
-          date: stdDate,
-          type: normType,
-          symbol,
-          direction,
-          amount: tradePnl,
-          fee: managementFee,
-          balance
-        });
+        const record = buildRecordFromTokens(tokens);
+        if (record) records.push(record);
       });
       return records;
     }
 
-    function importTextData(text) {
+    function recordKey(r) {
+      return [r.date, r.type, r.symbol, r.direction, r.amount, r.fee, r.balance].join('|');
+    }
+
+    function mergeAndSaveRecords(newRecords) {
       const dict = i18n[currentLang] || i18n.ja;
-      const newRecords = parseText(text);
       if (newRecords.length === 0) {
         alert(dict.msgInvalidFormat);
         return;
       }
 
-      const incomingDates = new Set(newRecords.map(r => r.date));
       const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const filteredExisting = existing.filter(r => !incomingDates.has(r.date));
+      const seenKeys = new Set(existing.map(recordKey));
+      const uniqueNew = [];
+      newRecords.forEach(r => {
+        const key = recordKey(r);
+        if (!seenKeys.has(key)) {
+          seenKeys.add(key);
+          uniqueNew.push(r);
+        }
+      });
 
-      const combined = [...filteredExisting, ...newRecords];
+      if (uniqueNew.length === 0) {
+        alert(dict.msgNoNewData);
+        return;
+      }
+
+      const combined = [...existing, ...uniqueNew];
       localStorage.setItem(STORAGE_KEY, JSON.stringify(combined));
 
-      alert(`${newRecords.length} ${dict.msgSuccessImport}`);
+      alert(`${uniqueNew.length} ${dict.msgSuccessImport}`);
       render();
+    }
+
+    function importTextData(text) {
+      mergeAndSaveRecords(parseText(text));
     }
 
     function processData() {
@@ -1281,15 +1319,57 @@
       togglePastePopup();
     }
 
-    function handleFileUpload(e) {
+    function handleExcelUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
+      const dict = i18n[currentLang] || i18n.ja;
       const reader = new FileReader();
-      reader.onload = function(evt) { 
-        importTextData(evt.target.result); 
+      reader.onload = function(evt) {
+        try {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true, defval: '' });
+          importExcelRows(rows);
+        } catch (err) {
+          console.error(err);
+          alert(dict.msgInvalidFormat);
+        }
       };
-      reader.readAsText(file, 'utf-8');
+      reader.readAsArrayBuffer(file);
       e.target.value = '';
+    }
+
+    function formatExcelDate(val) {
+      if (val instanceof Date && !isNaN(val)) {
+        const y = val.getFullYear();
+        const m = String(val.getMonth() + 1).padStart(2, '0');
+        const d = String(val.getDate()).padStart(2, '0');
+        return `${y}/${m}/${d}`;
+      }
+      return String(val || '');
+    }
+
+    function importExcelRows(rows) {
+      const records = [];
+      rows.forEach((row) => {
+        if (!row || row.length === 0) return;
+        const firstCell = String(row[0] || '').trim();
+        if (!firstCell || firstCell.startsWith('日時') || firstCell.startsWith('﻿日時')) return;
+
+        // Build tokens straight from the sheet's own cells (no comma/tab
+        // re-splitting), so thousand-separator commas inside amounts like
+        // "202,415 円" are never mistaken for field separators.
+        const tokens = [
+          formatExcelDate(row[0]),
+          row[1], row[2], row[3], row[4], row[5], row[6]
+        ].map(v => (v === undefined || v === null) ? '' : String(v));
+
+        const record = buildRecordFromTokens(tokens);
+        if (record) records.push(record);
+      });
+      mergeAndSaveRecords(records);
     }
 
     function addManualDailyRecord(e) {
