@@ -148,7 +148,7 @@
         <h2 id="viewTitle" class="text-xl md:text-2xl font-extrabold text-slate-800 flex items-center gap-2">
           <span>📊</span> <span data-i18n="viewTitleDashboard">総合ダッシュボード</span>
         </h2>
-        <select id="dashboardAssetFilter" onchange="render()" class="clay-input px-3.5 py-2 text-sm font-bold text-slate-700 hidden sm:block">
+        <select id="dashboardAssetFilter" onchange="render()" class="clay-input px-3.5 py-2 text-sm font-bold text-slate-700 w-full sm:w-auto">
           <option value="ALL" data-i18n="filterAllAssets">全資産総合</option>
         </select>
       </div>
@@ -264,7 +264,7 @@
 
       <div class="clay-card-sky p-4 rounded-3xl flex flex-col justify-between">
         <div class="flex justify-between items-start">
-          <span class="text-xs font-bold text-sky-800" data-i18n="kpiBalanceTitle">累積投資額 (元本)</span>
+          <span class="text-xs font-bold text-sky-800" data-i18n="kpiBalanceTitle">確定日本円残高</span>
           <span class="text-base">🏦</span>
         </div>
         <div class="my-2">
@@ -604,7 +604,7 @@
         kpiTotalFeeSub: '06:00 ロールオーバー費',
         kpiUnrealizedTitle: '未実現損益 (含み益)',
         kpiUnrealizedSub: '保有ポジション評価額',
-        kpiBalanceTitle: '累積投資額 (元本)',
+        kpiBalanceTitle: '確定日本円残高',
         kpiBalanceSub: '最新精算データ基準',
         kpiRoiTitle: '元本対比収益率',
         kpiRoiSub: '総損益 ÷ 初期元本',
