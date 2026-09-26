@@ -3,10 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>レバレッジ資産管理システム</title>
+  <title>レバレッジ資産管理</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Firebase SDK 추가 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Firebase 프로젝트 설정 정보 반영 완료
+    const firebaseConfig = {
+      apiKey: "AIzaSyBbWSnz4koHWTw4MvtE-acaZgNo7zQjaUE",
+      authDomain: "leverage-81c37.firebaseapp.com",
+      projectId: "leverage-81c37",
+      storageBucket: "leverage-81c37.firebasestorage.app",
+      messagingSenderId: "1018819249783",
+      appId: "1:1018819249783:web:14dafeca59ccdf3ee53a872"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    window.firebaseAuth = auth;
+    window.firebaseDb = db;
+    window.googleProvider = provider;
+    window.signInWithPopup = signInWithPopup;
+    window.signOut = signOut;
+    window.doc = doc;
+    window.setDoc = setDoc;
+    window.getDoc = getDoc;
+    window.onSnapshot = onSnapshot;
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+KR:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -98,13 +129,28 @@
 
   <aside class="w-full md:w-84 lg:w-96 bg-white/85 backdrop-blur-md border-r border-slate-200/80 flex flex-col justify-between shrink-0 p-6 z-20">
     <div class="space-y-8">
-      <div class="flex items-center gap-3.5 px-2">
-        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-400 via-teal-300 to-rose-300 flex items-center justify-center text-2xl shadow-md shadow-sky-200 text-white font-black">
-          ⚡
+      <div class="flex items-center justify-between px-2">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-400 via-teal-300 to-rose-300 flex items-center justify-center text-2xl shadow-md shadow-sky-200 text-white font-black">
+            ⚡
+          </div>
+          <div>
+            <h1 class="text-xl font-black text-slate-800 tracking-tight" data-i18n="appTitle">レバレッジ資産管理</h1>
+            <p class="text-xs font-bold text-sky-500 tracking-wider">PRO DASHBOARD</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-xl font-black text-slate-800 tracking-tight" data-i18n="appTitle">レバレッジ資産管理</h1>
-          <p class="text-xs font-bold text-sky-500 tracking-wider">PRO DASHBOARD</p>
+      </div>
+
+      <!-- 구글 로그인 / 로그아웃 버튼 영역 -->
+      <div id="authSection" class="px-2">
+        <button id="loginBtn" onclick="handleGoogleLogin()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold border border-slate-200 py-3 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
+          <span>🌐</span> <span data-i18n="btnLoginGoogle">구글 계정으로 로그인</span>
+        </button>
+        <div id="userInfo" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+          <div class="text-xs font-bold text-slate-700 truncate" id="userEmail"></div>
+          <button onclick="handleLogout()" class="w-full text-center text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 py-1.5 rounded-xl transition" data-i18n="btnLogout">
+            로그아웃
+          </button>
         </div>
       </div>
 
@@ -131,9 +177,9 @@
       <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1">
         <div class="flex justify-between items-center text-xs font-bold text-slate-600">
           <span data-i18n="storageStatusTitle">データ保存先</span>
-          <span class="text-teal-500 flex items-center gap-1 font-extrabold" data-i18n="storageStatusSafe">● ローカル保管</span>
+          <span class="text-teal-500 flex items-center gap-1 font-extrabold" data-i18n="storageStatusSafe">● Firebase 동기화</span>
         </div>
-        <p class="text-[11px] text-slate-400" data-i18n="storageStatusDesc">すべての取引データが端末に安全に保存されています。</p>
+        <p class="text-[11px] text-slate-400" data-i18n="storageStatusDesc">모든 데이터가 클라우드에 실시간 동기화됩니다.</p>
       </div>
       <button onclick="clearAllData()" class="w-full text-center text-xs font-bold text-rose-400 hover:text-rose-500 hover:bg-rose-50 py-2.5 rounded-xl transition" data-i18n="btnResetAll">
         すべてのデータを初期化
@@ -560,8 +606,6 @@
   </main>
 
   <script>
-    const STORAGE_KEY = 'gmo_leverage_parsed_records_v10';
-    const POSITION_STORAGE_KEY = 'gmo_leverage_manual_position_v6';
     const LANG_STORAGE_KEY = 'gmo_leverage_lang_v4';
 
     let currentLang = localStorage.getItem(LANG_STORAGE_KEY) || 'ja';
@@ -569,6 +613,11 @@
     let donutChart = null;
     let editingDate = null;
     let manualPrincipalOverride = false;
+
+    let currentUserUid = null;
+    let currentRecords = [];
+    let currentPosition = {};
+    let unsubscribeFirestore = null;
 
     const i18n = {
       ja: {
@@ -579,8 +628,8 @@
         navDaily: '日別詳細',
         navBackup: 'バックアップ',
         storageStatusTitle: 'データ保存先',
-        storageStatusSafe: '● ローカル保管',
-        storageStatusDesc: 'すべての取引データが端末に安全に保存されています。',
+        storageStatusSafe: '● Firebase 同期',
+        storageStatusDesc: 'すべてのデータがクラウドに実時間同期されます。',
         btnResetAll: 'すべてのデータを初期化',
         viewTitleDashboard: '総合ダッシュボード',
         viewTitleSettings: '資産およびポジション設定',
@@ -665,7 +714,9 @@
         btnEdit: '編集',
         btnDelete: '削除',
         btnSave: '保存',
-        btnCancel: 'キャンセル'
+        btnCancel: 'キャンセル',
+        btnLoginGoogle: '구글 계정으로 로그인',
+        btnLogout: '로그아웃'
       },
       en: {
         appTitle: 'Leverage Asset Manager',
@@ -675,8 +726,8 @@
         navDaily: 'Daily Details',
         navBackup: 'Backup',
         storageStatusTitle: 'Data Storage',
-        storageStatusSafe: '● Local Secure Storage',
-        storageStatusDesc: 'All transaction data is safely saved on your device.',
+        storageStatusSafe: '● Firebase Sync',
+        storageStatusDesc: 'All data is synchronized with the cloud in real-time.',
         btnResetAll: 'Reset All Data',
         viewTitleDashboard: 'Comprehensive Dashboard',
         viewTitleSettings: 'Asset & Position Settings',
@@ -761,7 +812,9 @@
         btnEdit: 'Edit',
         btnDelete: 'Delete',
         btnSave: 'Save',
-        btnCancel: 'Cancel'
+        btnCancel: 'Cancel',
+        btnLoginGoogle: 'Sign in with Google',
+        btnLogout: 'Sign Out'
       },
       ko: {
         appTitle: '레버리지 자산관리',
@@ -771,8 +824,8 @@
         navDaily: '일별 상세 내역',
         navBackup: '백업 (추출/반영)',
         storageStatusTitle: '데이터 저장소',
-        storageStatusSafe: '● 로컬 안전 보관',
-        storageStatusDesc: '모든 거래 데이터가 브라우저에 안전하게 보관 중입니다.',
+        storageStatusSafe: '● Firebase 실시간 동기화',
+        storageStatusDesc: '모든 데이터가 클라우드에 안전하게 동기화됩니다.',
         btnResetAll: '전체 데이터 초기화',
         viewTitleDashboard: '종합 대시보드',
         viewTitleSettings: '자산 및 포지션 설정',
@@ -857,7 +910,9 @@
         btnEdit: '수정',
         btnDelete: '삭제',
         btnSave: '저장',
-        btnCancel: '취소'
+        btnCancel: '취소',
+        btnLoginGoogle: '구글 계정으로 로그인',
+        btnLogout: '로그아웃'
       },
       zh: {
         appTitle: '杠杆资产管理系统',
@@ -867,8 +922,8 @@
         navDaily: '每日明细',
         navBackup: '数据备份',
         storageStatusTitle: '数据存储',
-        storageStatusSafe: '● 本地安全存储',
-        storageStatusDesc: '所有交易数据均安全保存在您的本地浏览器中。',
+        storageStatusSafe: '● Firebase 实时同步',
+        storageStatusDesc: '所有数据已安全同步至云端。',
         btnResetAll: '重置所有数据',
         viewTitleDashboard: '综合仪表盘',
         viewTitleSettings: '资产与仓位设置',
@@ -953,7 +1008,9 @@
         btnEdit: '编辑',
         btnDelete: '删除',
         btnSave: '保存',
-        btnCancel: '取消'
+        btnCancel: '取消',
+        btnLoginGoogle: '使用谷歌账号登录',
+        btnLogout: '登出'
       },
       es: {
         appTitle: 'Gestor de Activos con Apalancamiento',
@@ -963,8 +1020,8 @@
         navDaily: 'Detalles Diarios',
         navBackup: 'Copia de Seguridad',
         storageStatusTitle: 'Almacenamiento',
-        storageStatusSafe: '● Guardado Local Seguro',
-        storageStatusDesc: 'Todos los datos están guardados de forma segura en su navegador.',
+        storageStatusSafe: '● Sincronización Firebase',
+        storageStatusDesc: 'Todos los datos se sincronizan con la nube en tiempo real.',
         btnResetAll: 'Restablecer Todo',
         viewTitleDashboard: 'Panel General',
         viewTitleSettings: 'Configuración de Activos y Posición',
@@ -1049,9 +1106,85 @@
         btnEdit: 'Editar',
         btnDelete: 'Eliminar',
         btnSave: 'Guardar',
-        btnCancel: 'Cancelar'
+        btnCancel: 'Cancelar',
+        btnLoginGoogle: 'Iniciar sesión con Google',
+        btnLogout: 'Cerrar sesión'
       }
     };
+
+    function initFirebaseSync() {
+      const auth = window.firebaseAuth;
+      const db = window.firebaseDb;
+      
+      onAuthStateChanged(auth, (user) => {
+        const loginBtn = document.getElementById('loginBtn');
+        const userInfo = document.getElementById('userInfo');
+        const userEmail = document.getElementById('userEmail');
+
+        if (user) {
+          currentUserUid = user.uid;
+          loginBtn.classList.add('hidden');
+          userInfo.classList.remove('hidden');
+          userEmail.textContent = user.email || user.displayName || 'Google User';
+
+          if (unsubscribeFirestore) unsubscribeFirestore();
+          const docRef = window.doc(db, "users", currentUserUid);
+          unsubscribeFirestore = window.onSnapshot(docRef, (docSnap) => {
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              currentRecords = data.records || [];
+              currentPosition = data.position || {};
+            } else {
+              currentRecords = [];
+              currentPosition = {};
+            }
+            loadSavedPositionToUI();
+            render();
+          });
+        } else {
+          currentUserUid = null;
+          if (unsubscribeFirestore) { unsubscribeFirestore(); unsubscribeFirestore = null; }
+          loginBtn.classList.remove('hidden');
+          userInfo.classList.add('hidden');
+          currentRecords = [];
+          currentPosition = {};
+          loadSavedPositionToUI();
+          render();
+        }
+      });
+    }
+
+    async function handleGoogleLogin() {
+      try {
+        await window.signInWithPopup(window.firebaseAuth, window.googleProvider);
+      } catch (error) {
+        console.error("Login Error:", error);
+        alert("로그인 중 오류가 발생했습니다: " + error.message);
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await window.signOut(window.firebaseAuth);
+      } catch (error) {
+        console.error("Logout Error:", error);
+      }
+    }
+
+    async function saveToFirestore() {
+      if (!currentUserUid) return;
+      const db = window.firebaseDb;
+      const docRef = window.doc(db, "users", currentUserUid);
+      try {
+        await window.setDoc(docRef, {
+          records: currentRecords,
+          position: currentPosition,
+          updatedAt: new Date().toISOString()
+        });
+      } catch (err) {
+        console.error("Firestore Save Error:", err);
+      }
+    }
 
     function setLanguage(lang) {
       currentLang = lang;
@@ -1155,36 +1288,47 @@
       const unrealizedPnl = Number(document.getElementById('posUnrealizedPnl').value) || 0;
       const margin = Number(document.getElementById('posMargin').value) || 0;
 
-      const posData = { principal, symbol, amount, unrealizedPnl, margin, manualPrincipalOverride };
-      localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(posData));
+      currentPosition = { principal, symbol, amount, unrealizedPnl, margin, manualPrincipalOverride };
+      if (currentUserUid) {
+        saveToFirestore();
+      } else {
+        localStorage.setItem('gmo_leverage_manual_position_v6', JSON.stringify(currentPosition));
+      }
       render();
     }
 
-    function loadSavedPosition() {
-      const posData = JSON.parse(localStorage.getItem(POSITION_STORAGE_KEY) || '{}');
-      if (posData.principal !== undefined && posData.principal !== null) {
-        document.getElementById('principalAmount').value = posData.principal;
+    function loadSavedPositionToUI() {
+      if (!currentUserUid) {
+        currentPosition = JSON.parse(localStorage.getItem('gmo_leverage_manual_position_v6') || '{}');
       }
-      if (posData.manualPrincipalOverride) {
+
+      if (currentPosition.principal !== undefined && currentPosition.principal !== null) {
+        document.getElementById('principalAmount').value = currentPosition.principal;
+      } else {
+        document.getElementById('principalAmount').value = '';
+      }
+      if (currentPosition.manualPrincipalOverride) {
         manualPrincipalOverride = true;
+      } else {
+        manualPrincipalOverride = false;
       }
       
-      if (posData.symbol) {
+      if (currentPosition.symbol) {
         const select = document.getElementById('posSymbol');
         const customInput = document.getElementById('customPosSymbol');
         const options = Array.from(select.options).map(o => o.value);
-        if (options.includes(posData.symbol)) {
-          select.value = posData.symbol;
+        if (options.includes(currentPosition.symbol)) {
+          select.value = currentPosition.symbol;
           customInput.classList.add('hidden');
         } else {
           select.value = '기타';
-          customInput.value = posData.symbol;
+          customInput.value = currentPosition.symbol;
           customInput.classList.remove('hidden');
         }
       }
-      if (posData.amount) document.getElementById('posAmount').value = posData.amount;
-      if (posData.unrealizedPnl !== undefined) document.getElementById('posUnrealizedPnl').value = posData.unrealizedPnl;
-      if (posData.margin) document.getElementById('posMargin').value = posData.margin;
+      document.getElementById('posAmount').value = currentPosition.amount !== undefined ? currentPosition.amount : '';
+      document.getElementById('posUnrealizedPnl').value = currentPosition.unrealizedPnl !== undefined ? currentPosition.unrealizedPnl : '';
+      document.getElementById('posMargin').value = currentPosition.margin !== undefined ? currentPosition.margin : '';
     }
 
     function parseCSVLine(text, delimiter = ',') {
@@ -1257,11 +1401,6 @@
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith('日時') || trimmed.startsWith('﻿日時')) return;
 
-        // Prefer tab as the delimiter when present (e.g. pasted from a
-        // spreadsheet or the exchange's own page), since amounts like
-        // "202,415 円" contain a thousands-separator comma that must not
-        // be mistaken for a field separator. Only fall back to comma
-        // splitting for genuine comma-separated CSV lines without tabs.
         const delimiter = trimmed.includes('\t') ? '\t' : ',';
         let tokens = parseCSVLine(trimmed, delimiter);
         if (tokens.length < 5) tokens = trimmed.split(/[\t ]+/);
@@ -1284,8 +1423,11 @@
         return;
       }
 
-      const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const seenKeys = new Set(existing.map(recordKey));
+      if (!currentUserUid) {
+        currentRecords = JSON.parse(localStorage.getItem('gmo_leverage_parsed_records_v10') || '[]');
+      }
+
+      const seenKeys = new Set(currentRecords.map(recordKey));
       const uniqueNew = [];
       newRecords.forEach(r => {
         const key = recordKey(r);
@@ -1300,8 +1442,12 @@
         return;
       }
 
-      const combined = [...existing, ...uniqueNew];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(combined));
+      currentRecords = [...currentRecords, ...uniqueNew];
+      if (currentUserUid) {
+        saveToFirestore();
+      } else {
+        localStorage.setItem('gmo_leverage_parsed_records_v10', JSON.stringify(currentRecords));
+      }
 
       alert(`${uniqueNew.length} ${dict.msgSuccessImport}`);
       render();
@@ -1358,9 +1504,6 @@
         const firstCell = String(row[0] || '').trim();
         if (!firstCell || firstCell.startsWith('日時') || firstCell.startsWith('﻿日時')) return;
 
-        // Build tokens straight from the sheet's own cells (no comma/tab
-        // re-splitting), so thousand-separator commas inside amounts like
-        // "202,415 円" are never mistaken for field separators.
         const tokens = [
           formatExcelDate(row[0]),
           row[1], row[2], row[3], row[4], row[5], row[6]
@@ -1382,8 +1525,11 @@
       const fee = Number(document.getElementById('newRecFee').value) || 0;
       const balance = Number(document.getElementById('newRecBalance').value) || 0;
 
-      const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      records.push({
+      if (!currentUserUid) {
+        currentRecords = JSON.parse(localStorage.getItem('gmo_leverage_parsed_records_v10') || '[]');
+      }
+
+      currentRecords.push({
         date: stdDate,
         type: '手動登録',
         symbol,
@@ -1393,7 +1539,11 @@
         balance
       });
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      if (currentUserUid) {
+        saveToFirestore();
+      } else {
+        localStorage.setItem('gmo_leverage_parsed_records_v10', JSON.stringify(currentRecords));
+      }
 
       document.getElementById('newRecTradePnl').value = '0';
       document.getElementById('newRecFee').value = '0';
@@ -1409,10 +1559,12 @@
       const editFee = Number(document.getElementById(`edit-fee-${dateStr}`).value) || 0;
       const editBalance = Number(document.getElementById(`edit-bal-${dateStr}`).value) || 0;
 
-      let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      records = records.filter(r => r.date !== dateStr);
+      if (!currentUserUid) {
+        currentRecords = JSON.parse(localStorage.getItem('gmo_leverage_parsed_records_v10') || '[]');
+      }
 
-      records.push({
+      currentRecords = currentRecords.filter(r => r.date !== dateStr);
+      currentRecords.push({
         date: dateStr,
         type: '手動修正',
         symbol: editSymbol,
@@ -1422,7 +1574,12 @@
         balance: editBalance
       });
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+      if (currentUserUid) {
+        saveToFirestore();
+      } else {
+        localStorage.setItem('gmo_leverage_parsed_records_v10', JSON.stringify(currentRecords));
+      }
+
       editingDate = null;
       render();
     }
@@ -1430,23 +1587,32 @@
     function deleteDailyRecord(dateStr) {
       const dict = i18n[currentLang] || i18n.ja;
       if (confirm(`${dateStr} ${dict.msgDeleteConfirm}`)) {
-        let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-        records = records.filter(r => r.date !== dateStr);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        if (!currentUserUid) {
+          currentRecords = JSON.parse(localStorage.getItem('gmo_leverage_parsed_records_v10') || '[]');
+        }
+        currentRecords = currentRecords.filter(r => r.date !== dateStr);
+        if (currentUserUid) {
+          saveToFirestore();
+        } else {
+          localStorage.setItem('gmo_leverage_parsed_records_v10', JSON.stringify(currentRecords));
+        }
         render();
       }
     }
 
     function render() {
       const dict = i18n[currentLang] || i18n.ja;
-      const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      const posData = JSON.parse(localStorage.getItem(POSITION_STORAGE_KEY) || '{}');
-      const manualUnrealizedPnl = Number(posData.unrealizedPnl) || 0;
+      if (!currentUserUid) {
+        currentRecords = JSON.parse(localStorage.getItem('gmo_leverage_parsed_records_v10') || '[]');
+        currentPosition = JSON.parse(localStorage.getItem('gmo_leverage_manual_position_v6') || '{}');
+      }
+
+      const manualUnrealizedPnl = Number(currentPosition.unrealizedPnl) || 0;
 
       const filterEl = document.getElementById('dashboardAssetFilter');
       const currentSelectedAsset = filterEl.value || 'ALL';
       const allSymbols = new Set();
-      records.forEach(r => { if(r.symbol && r.symbol !== '기타') allSymbols.add(r.symbol); });
+      currentRecords.forEach(r => { if(r.symbol && r.symbol !== '기타') allSymbols.add(r.symbol); });
       
       filterEl.innerHTML = `<option value="ALL">${dict.filterAllAssets}</option>`;
       allSymbols.forEach(sym => {
@@ -1455,10 +1621,10 @@
         if(sym === currentSelectedAsset) opt.selected = true;
         filterEl.appendChild(opt);
       });
-      if (posData.symbol && posData.symbol !== '기타' && !allSymbols.has(posData.symbol)) {
+      if (currentPosition.symbol && currentPosition.symbol !== '기타' && !allSymbols.has(currentPosition.symbol)) {
         const opt = document.createElement('option');
-        opt.value = posData.symbol; opt.textContent = posData.symbol;
-        if(posData.symbol === currentSelectedAsset) opt.selected = true;
+        opt.value = currentPosition.symbol; opt.textContent = currentPosition.symbol;
+        if(currentPosition.symbol === currentSelectedAsset) opt.selected = true;
         filterEl.appendChild(opt);
       }
 
@@ -1469,7 +1635,7 @@
       let totalTradePnl = 0;
       let totalFee = 0;
 
-      records.forEach(r => {
+      currentRecords.forEach(r => {
         const d = r.date;
         if (!dailyMap[d]) {
           dailyMap[d] = { 
@@ -1506,7 +1672,7 @@
         if (d.balance > 0) latestBal = d.balance;
       });
 
-      const isActivePosMatch = (activeFilter === 'ALL' || activeFilter === posData.symbol);
+      const isActivePosMatch = (activeFilter === 'ALL' || activeFilter === currentPosition.symbol);
       const activeUnrealizedPnl = isActivePosMatch ? manualUnrealizedPnl : 0;
 
       const netRealizedPnl = totalTradePnl - totalFee;
@@ -1517,8 +1683,8 @@
       if (calculatedPrincipal < 0) calculatedPrincipal = 0;
 
       let finalPrincipal = calculatedPrincipal;
-      if (posData.principal !== null && posData.principal !== undefined && posData.manualPrincipalOverride) {
-        finalPrincipal = Number(posData.principal);
+      if (currentPosition.principal !== null && currentPosition.principal !== undefined && currentPosition.manualPrincipalOverride) {
+        finalPrincipal = Number(currentPosition.principal);
       } else {
         const pInput = document.getElementById('principalAmount');
         if (pInput && !manualPrincipalOverride) {
@@ -1548,7 +1714,7 @@
       document.getElementById('kpiTotalFee').textContent = `-¥${Math.round(totalFee).toLocaleString()}`;
 
       document.getElementById('kpiUnrealizedPnl').textContent = formatYen(activeUnrealizedPnl);
-      document.getElementById('kpiUnrealizedSub').textContent = isActivePosMatch ? `${posData.symbol || 'LINK/JPY'} (${posData.amount || 0})` : '-';
+      document.getElementById('kpiUnrealizedSub').textContent = isActivePosMatch ? `${currentPosition.symbol || 'LINK/JPY'} (${currentPosition.amount || 0})` : '-';
 
       document.getElementById('kpiLatestBalance').textContent = `¥${Math.round(latestBal).toLocaleString()}`;
 
@@ -1779,8 +1945,8 @@
     function exportBackupJSON() {
       const backupData = {
         version: '10.0', exportedAt: new Date().toISOString(),
-        position: JSON.parse(localStorage.getItem(POSITION_STORAGE_KEY) || '{}'),
-        records: JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+        position: currentPosition,
+        records: currentRecords
       };
       const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -1794,13 +1960,21 @@
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = function(evt) {
+      reader.onload = async function(evt) {
         try {
           const data = JSON.parse(evt.target.result);
           if (data.records && Array.isArray(data.records)) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data.records));
-            if (data.position) localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(data.position));
-            loadSavedPosition();
+            currentRecords = data.records;
+            if (data.position) currentPosition = data.position;
+            
+            if (currentUserUid) {
+              await saveToFirestore();
+            } else {
+              localStorage.setItem('gmo_leverage_parsed_records_v10', JSON.stringify(currentRecords));
+              localStorage.setItem('gmo_leverage_manual_position_v6', JSON.stringify(currentPosition));
+            }
+
+            loadSavedPositionToUI();
             alert(dict.msgSuccessBackup);
             render(); navigate('dashboard');
           }
@@ -1811,24 +1985,32 @@
 
     function exportCSV() {
       const dict = i18n[currentLang] || i18n.ja;
-      const records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      if (records.length === 0) return alert(dict.noDataText);
+      if (currentRecords.length === 0) return alert(dict.noDataText);
       let csvContent = '\uFEFF日時,精算区分,銘柄名,受取/支払,金額,手数料,残高\n';
-      records.forEach(r => {
+      currentRecords.forEach(r => {
         csvContent += `"${r.date}","${r.type}","${r.symbol}","${r.direction}","${r.amount} 円","${r.fee} 円","${r.balance} 円"\n`;
       });
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = `Leverage_Asset_Records_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.href = url; a.download = `Leverage_Asset_Records_${new Date().toISOString().slice(0, 10)}.json`.replace('.json', '.csv');
       a.click(); URL.revokeObjectURL(url);
     }
 
-    function clearAllData() {
+    async function clearAllData() {
       const dict = i18n[currentLang] || i18n.ja;
       if (confirm(dict.msgResetConfirm)) {
-        localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(POSITION_STORAGE_KEY);
+        currentRecords = [];
+        currentPosition = {};
         manualPrincipalOverride = false;
+
+        if (currentUserUid) {
+          await saveToFirestore();
+        } else {
+          localStorage.removeItem('gmo_leverage_parsed_records_v10');
+          localStorage.removeItem('gmo_leverage_manual_position_v6');
+        }
+
         document.getElementById('principalAmount').value = ''; 
         document.getElementById('posAmount').value = '';
         document.getElementById('posUnrealizedPnl').value = ''; 
@@ -1844,9 +2026,8 @@
     }
 
     setLanguage(currentLang);
-    loadSavedPosition();
+    initFirebaseSync();
     initTodayDate();
-    render();
   </script>
 </body>
 </html>
