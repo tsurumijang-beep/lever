@@ -37,6 +37,7 @@
     window.setDoc = setDoc;
     window.getDoc = getDoc;
     window.onSnapshot = onSnapshot;
+    window.dispatchEvent(new Event('firebaseReady'));
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2053,7 +2054,11 @@
     }
 
     setLanguage(currentLang);
-    initFirebaseSync();
+    if (window.firebaseAuth) {
+      initFirebaseSync();
+    } else {
+      window.addEventListener('firebaseReady', initFirebaseSync);
+    }
     initTodayDate();
   </script>
 </body>
