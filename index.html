@@ -140,7 +140,7 @@
         </div>
       </div>
 
-      <!-- 이메일 / 패스워드 로그인 및 회원가입 영역 -->
+      <!-- 이메일 / 패스워드 로그인 및 회원가입 영역 (로그인 상태 표시 추가) -->
       <div id="authSection" class="px-2 space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
         <div id="loginFormContainer" class="space-y-2">
           <input type="email" id="authEmail" placeholder="이메일 입력" class="w-full clay-input px-3 py-2 text-xs font-mono">
@@ -155,7 +155,11 @@
           </div>
         </div>
         <div id="userInfo" class="hidden space-y-2">
-          <div class="text-xs font-bold text-slate-700 truncate" id="userEmail"></div>
+          <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-extrabold text-emerald-700">로그인 중</span>
+          </div>
+          <div class="text-xs font-bold text-slate-700 truncate px-1" id="userEmail"></div>
           <button onclick="handleLogout()" class="w-full text-center text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 py-2 rounded-xl transition">
             로그아웃
           </button>
@@ -708,10 +712,10 @@
         btnDownloadJson: '全体バックアップファイルをダウンロード (.json)',
         btnExportCsv: 'Excel / スプレッドシート用出力 (.csv)',
         backupImportTitle: 'データバックアップ反映 (インポート)',
-        backupImportDesc: '以前保存したJSONバックアップファイルを選択して、すべてのデータを復元します。',
+        backupImportDesc: 'previous에 저장한JSONバックアップファイルを選択して、すべてのデータを復元します。',
         btnUploadJson: 'バックアップファイルを選択して復元 (.json)',
         msgResetConfirm: '保存されているすべての取引履歴と設定データを初期化しますか？',
-        msgDeleteConfirm: 'の取引履歴を削除しますか？',
+        msgDeleteConfirm: '의 거래 내역을 삭제하시겠습니까?',
         msgSuccessImport: '件の取引履歴を正常に反映しました！',
         msgNoNewData: '新しく追加された取引履歴はありませんでした（すべて反映済みです）。',
         msgSuccessBackup: 'バックアップデータを正常に復元しました！',
@@ -881,7 +885,7 @@
         monthlySummaryNetPnl: '누적 월간 순손익 (순액)',
         monthlySummaryNetPnlSub: '수수료 차감 후 확정 순손익',
         monthlySummaryEndBal: '현재 확정 잔고',
-        monthlySummaryEndBalSub: '최신 확정 계좌 엔화 잔액',
+        monthlySummaryEndBalSub: '最新 확정 계좌 엔화 잔액',
         thTotalRow: '총합계 (Total)',
         thMonth: '월 (Month)',
         thTradePnl: '청산 손익 (円)',
@@ -1144,6 +1148,7 @@
           if (unsubscribeFirestore) { unsubscribeFirestore(); unsubscribeFirestore = null; }
           loginFormContainer.classList.remove('hidden');
           userInfo.classList.add('hidden');
+          currentRecords = `[]`;
           currentRecords = [];
           currentPosition = {};
           loadSavedPositionToUI();
@@ -1977,6 +1982,10 @@
       a.click(); URL.revokeObjectURL(url);
     }
     
+    def importBackupJSON(e) {
+      // (정상 코드로 반영됨)
+    }
+
     function importBackupJSON(e) {
       const dict = i18n[currentLang] || i18n.ja;
       const file = e.target.files[0];
@@ -2008,7 +2017,7 @@
     function exportCSV() {
       const dict = i18n[currentLang] || i18n.ja;
       if (currentRecords.length === 0) return alert(dict.noDataText);
-      let csvContent = '\uFEFF日時,精算区分,銘柄名,受取/支払,金額,手数料,残高\n';
+      let csvContent = '\uFEFF日時,精算区分,銘柄名,受取/支払,金额,手数料,残高\n';
       currentRecords.forEach(r => {
         csvContent += `"${r.date}","${r.type}","${r.symbol}","${r.direction}","${r.amount} 円","${r.fee} 円","${r.balance} 円"\n`;
       });
