@@ -1120,7 +1120,7 @@
       const auth = window.firebaseAuth;
       const db = window.firebaseDb;
       
-      window.onAuthStateChanged(auth, (user) => {
+      window.onAuthStateChanged(auth, async (user) => {
         const loginFormContainer = document.getElementById('loginFormContainer');
         const userInfo = document.getElementById('userInfo');
         const userEmail = document.getElementById('userEmail');
@@ -1133,6 +1133,22 @@
 
           if (unsubscribeFirestore) unsubscribeFirestore();
           const docRef = window.doc(db, "users", currentUserUid);
+
+          // 이 계정으로 Firestore에 저장된 적이 없는데, 이 브라우저의 localStorage에
+          // 게스트 상태에서 입력해둔 데이터가 남아있다면 최초 1회 클라우드로 올려준다.
+          try {
+            const initialSnap = await window.getDoc(docRef);
+            if (!initialSnap.exists()) {
+              const localRecords = JSON.parse(localStorage.getItem('gmo_leverage_parsed_records_v10') || '[]');
+              const localPosition = JSON.parse(localStorage.getItem('gmo_leverage_manual_position_v6') || '{}');
+              if (localRecords.length > 0 || Object.keys(localPosition).length > 0) {
+                await window.setDoc(docRef, { records: localRecords, position: localPosition });
+              }
+            }
+          } catch (migrateError) {
+            console.error('로컬 데이터 마이그레이션 실패:', migrateError);
+          }
+
           unsubscribeFirestore = window.onSnapshot(docRef, (docSnap) => {
             if (docSnap.exists()) {
               const data = docSnap.data();
