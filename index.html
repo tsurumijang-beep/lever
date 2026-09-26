@@ -712,10 +712,10 @@
         btnDownloadJson: '全体バックアップファイルをダウンロード (.json)',
         btnExportCsv: 'Excel / スプレッドシート用出力 (.csv)',
         backupImportTitle: 'データバックアップ反映 (インポート)',
-        backupImportDesc: 'previous에 저장한JSONバックアップファイルを選択して、すべてのデータを復元します。',
+        backupImportDesc: '以前保存したJSONバックアップファイルを選択して、すべてのデータを復元します。',
         btnUploadJson: 'バックアップファイルを選択して復元 (.json)',
         msgResetConfirm: '保存されているすべての取引履歴と設定データを初期化しますか？',
-        msgDeleteConfirm: '의 거래 내역을 삭제하시겠습니까?',
+        msgDeleteConfirm: 'の取引履歴を削除しますか？',
         msgSuccessImport: '件の取引履歴を正常に反映しました！',
         msgNoNewData: '新しく追加された取引履歴はありませんでした（すべて反映済みです）。',
         msgSuccessBackup: 'バックアップデータを正常に復元しました！',
@@ -885,7 +885,7 @@
         monthlySummaryNetPnl: '누적 월간 순손익 (순액)',
         monthlySummaryNetPnlSub: '수수료 차감 후 확정 순손익',
         monthlySummaryEndBal: '현재 확정 잔고',
-        monthlySummaryEndBalSub: '最新 확정 계좌 엔화 잔액',
+        monthlySummaryEndBalSub: '최신 확정 계좌 엔화 잔액',
         thTotalRow: '총합계 (Total)',
         thMonth: '월 (Month)',
         thTradePnl: '청산 손익 (円)',
@@ -1148,7 +1148,6 @@
           if (unsubscribeFirestore) { unsubscribeFirestore(); unsubscribeFirestore = null; }
           loginFormContainer.classList.remove('hidden');
           userInfo.classList.add('hidden');
-          currentRecords = `[]`;
           currentRecords = [];
           currentPosition = {};
           loadSavedPositionToUI();
@@ -1982,10 +1981,6 @@
       a.click(); URL.revokeObjectURL(url);
     }
     
-    def importBackupJSON(e) {
-      // (정상 코드로 반영됨)
-    }
-
     function importBackupJSON(e) {
       const dict = i18n[currentLang] || i18n.ja;
       const file = e.target.files[0];
