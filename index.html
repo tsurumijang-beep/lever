@@ -7,13 +7,12 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- Firebase SDK 추가 -->
+  <!-- Firebase SDK (Email/Password 인증 적용) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Firebase 프로젝트 설정 정보 (최신 구성 반영)[cite: 8]
     const firebaseConfig = {
       apiKey: "AIzaSyBbWSnz4koHWTw4MvtE-acaZgNo7zQjaUE",
       authDomain: "leverage-81c37.firebaseapp.com",
@@ -27,12 +26,11 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const provider = new GoogleAuthProvider();
 
     window.firebaseAuth = auth;
     window.firebaseDb = db;
-    window.googleProvider = provider;
-    window.signInWithPopup = signInWithPopup;
+    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
     window.signOut = signOut;
     window.doc = doc;
     window.setDoc = setDoc;
@@ -142,14 +140,23 @@
         </div>
       </div>
 
-      <!-- 구글 로그인 / 로그아웃 버튼 영역 -->
-      <div id="authSection" class="px-2">
-        <button id="loginBtn" onclick="handleGoogleLogin()" class="w-full bg-white hover:bg-slate-50 text-slate-700 font-bold border border-slate-200 py-3 px-4 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
-          <span>🌐</span> <span data-i18n="btnLoginGoogle">구글 계정으로 로그인</span>
-        </button>
-        <div id="userInfo" class="hidden space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+      <!-- 이메일 / 패스워드 로그인 및 회원가입 영역 -->
+      <div id="authSection" class="px-2 space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+        <div id="loginFormContainer" class="space-y-2">
+          <input type="email" id="authEmail" placeholder="이메일 입력" class="w-full clay-input px-3 py-2 text-xs font-mono">
+          <input type="password" id="authPassword" placeholder="비밀번호 (6자리 이상)" class="w-full clay-input px-3 py-2 text-xs font-mono">
+          <div class="flex gap-2 pt-1">
+            <button onclick="handleEmailLogin()" class="flex-1 clay-button text-white font-bold py-2 px-3 text-xs shadow-sm">
+              로그인
+            </button>
+            <button onclick="handleEmailRegister()" class="flex-1 bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 py-2 px-3 text-xs rounded-xl shadow-sm">
+              회원가입
+            </button>
+          </div>
+        </div>
+        <div id="userInfo" class="hidden space-y-2">
           <div class="text-xs font-bold text-slate-700 truncate" id="userEmail"></div>
-          <button onclick="handleLogout()" class="w-full text-center text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 py-1.5 rounded-xl transition" data-i18n="btnLogout">
+          <button onclick="handleLogout()" class="w-full text-center text-xs font-bold text-rose-500 hover:text-rose-600 bg-rose-50 hover:bg-rose-100 py-2 rounded-xl transition">
             로그아웃
           </button>
         </div>
@@ -178,9 +185,9 @@
       <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1">
         <div class="flex justify-between items-center text-xs font-bold text-slate-600">
           <span data-i18n="storageStatusTitle">データ保存先</span>
-          <span class="text-teal-500 flex items-center gap-1 font-extrabold" data-i18n="storageStatusSafe">● Firebase 동기화</span>
+          <span class="text-teal-500 flex items-center gap-1 font-extrabold">● Firebase 동기화</span>
         </div>
-        <p class="text-[11px] text-slate-400" data-i18n="storageStatusDesc">모든 데이터가 클라우드에 실시간 동기화됩니다.</p>
+        <p class="text-[11px] text-slate-400">이메일 계정으로 안전하게 연동됩니다.</p>
       </div>
       <button onclick="clearAllData()" class="w-full text-center text-xs font-bold text-rose-400 hover:text-rose-500 hover:bg-rose-50 py-2.5 rounded-xl transition" data-i18n="btnResetAll">
         すべてのデータを初期化
@@ -555,7 +562,7 @@
                 <th class="p-3.5" data-i18n="thSymbol">取引資産</th>
                 <th class="p-3.5 text-right" data-i18n="thTradePnl">決済損益 (円)</th>
                 <th class="p-3.5 text-right" data-i18n="thFee">当日手数料 (円)</th>
-                <th class="p-3.5 text-right" data-i18n="thNetPnl">日別純損益 (円)</th>
+                <th class="p-3.5 text-right" data-i18n="thNetPnl">月間純損益 (円)</th>
                 <th class="p-3.5 text-right" data-i18n="thDailyBal">当日残高 (円)</th>
                 <th class="p-3.5 text-center w-28" data-i18n="thAction">操作</th>
               </tr>
@@ -715,9 +722,7 @@
         btnEdit: '編集',
         btnDelete: '削除',
         btnSave: '保存',
-        btnCancel: 'キャンセル',
-        btnLoginGoogle: '구글 계정으로 로그인',
-        btnLogout: '로그아웃'
+        btnCancel: 'キャンセル'
       },
       en: {
         appTitle: 'Leverage Asset Manager',
@@ -809,13 +814,11 @@
         msgInvalidFormat: 'Invalid format. Please check your Excel file or pasted text.',
         noDataText: 'No data available. Please upload an Excel file or add daily records.',
         chartLabelNetPnl: 'Cumulative Net PnL (JPY)',
-        chartLabelBalance: 'Settled Balance (JPY)',
+        chartLabelBalance: 'Saldo Liquidado (JPY)',
         btnEdit: 'Edit',
         btnDelete: 'Delete',
         btnSave: 'Save',
-        btnCancel: 'Cancel',
-        btnLoginGoogle: 'Sign in with Google',
-        btnLogout: 'Sign Out'
+        btnCancel: 'Cancel'
       },
       ko: {
         appTitle: '레버리지 자산관리',
@@ -911,9 +914,7 @@
         btnEdit: '수정',
         btnDelete: '삭제',
         btnSave: '저장',
-        btnCancel: '취소',
-        btnLoginGoogle: '구글 계정으로 로그인',
-        btnLogout: '로그아웃'
+        btnCancel: '취소'
       },
       zh: {
         appTitle: '杠杆资产管理系统',
@@ -1009,9 +1010,7 @@
         btnEdit: '编辑',
         btnDelete: '删除',
         btnSave: '保存',
-        btnCancel: '取消',
-        btnLoginGoogle: '使用谷歌账号登录',
-        btnLogout: '登出'
+        btnCancel: '取消'
       },
       es: {
         appTitle: 'Gestor de Activos con Apalancamiento',
@@ -1107,9 +1106,7 @@
         btnEdit: 'Editar',
         btnDelete: 'Eliminar',
         btnSave: 'Guardar',
-        btnCancel: 'Cancelar',
-        btnLoginGoogle: 'Iniciar sesión con Google',
-        btnLogout: 'Cerrar sesión'
+        btnCancel: 'Cancelar'
       }
     };
 
@@ -1118,15 +1115,15 @@
       const db = window.firebaseDb;
       
       onAuthStateChanged(auth, (user) => {
-        const loginBtn = document.getElementById('loginBtn');
+        const loginFormContainer = document.getElementById('loginFormContainer');
         const userInfo = document.getElementById('userInfo');
         const userEmail = document.getElementById('userEmail');
 
         if (user) {
           currentUserUid = user.uid;
-          loginBtn.classList.add('hidden');
+          loginFormContainer.classList.add('hidden');
           userInfo.classList.remove('hidden');
-          userEmail.textContent = user.email || user.displayName || 'Google User';
+          userEmail.textContent = user.email || 'User';
 
           if (unsubscribeFirestore) unsubscribeFirestore();
           const docRef = window.doc(db, "users", currentUserUid);
@@ -1145,7 +1142,7 @@
         } else {
           currentUserUid = null;
           if (unsubscribeFirestore) { unsubscribeFirestore(); unsubscribeFirestore = null; }
-          loginBtn.classList.remove('hidden');
+          loginFormContainer.classList.remove('hidden');
           userInfo.classList.add('hidden');
           currentRecords = [];
           currentPosition = {};
@@ -1155,12 +1152,36 @@
       });
     }
 
-    async function handleGoogleLogin() {
+    async function handleEmailLogin() {
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      if (!email || !password) {
+        alert('이메일과 비밀번호를 입력해주세요.');
+        return;
+      }
       try {
-        await window.signInWithPopup(window.firebaseAuth, window.googleProvider);
+        await window.signInWithEmailAndPassword(window.firebaseAuth, email, password);
       } catch (error) {
-        console.error("Login Error:", error);
-        alert("로그인 중 오류가 발생했습니다: " + error.message);
+        alert("로그인 실패: " + error.message);
+      }
+    }
+
+    async function handleEmailRegister() {
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      if (!email || !password) {
+        alert('이메일과 비밀번호를 입력해주세요.');
+        return;
+      }
+      if (password.length < 6) {
+        alert('비밀번호는 6자리 이상이어야 합니다.');
+        return;
+      }
+      try {
+        await window.createUserWithEmailAndPassword(window.firebaseAuth, email, password);
+        alert('회원가입 및 로그인이 완료되었습니다!');
+      } catch (error) {
+        alert("회원가입 실패: " + error.message);
       }
     }
 
