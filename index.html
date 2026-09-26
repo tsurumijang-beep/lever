@@ -32,6 +32,7 @@
     window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
     window.signInWithEmailAndPassword = signInWithEmailAndPassword;
     window.signOut = signOut;
+    window.onAuthStateChanged = onAuthStateChanged;
     window.doc = doc;
     window.setDoc = setDoc;
     window.getDoc = getDoc;
@@ -140,7 +141,7 @@
         </div>
       </div>
 
-      <!-- 이메일 / 패스워드 로그인 및 회원가입 영역 (로그인 상태 표시 추가) -->
+      <!-- 이메일 / 패스워드 로그인 및 회원가입 영역 -->
       <div id="authSection" class="px-2 space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
         <div id="loginFormContainer" class="space-y-2">
           <input type="email" id="authEmail" placeholder="이메일 입력" class="w-full clay-input px-3 py-2 text-xs font-mono">
@@ -1118,7 +1119,7 @@
       const auth = window.firebaseAuth;
       const db = window.firebaseDb;
       
-      onAuthStateChanged(auth, (user) => {
+      window.onAuthStateChanged(auth, (user) => {
         const loginFormContainer = document.getElementById('loginFormContainer');
         const userInfo = document.getElementById('userInfo');
         const userEmail = document.getElementById('userEmail');
